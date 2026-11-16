@@ -11,7 +11,7 @@ public class Grass implements Actor, NonBlocking {
     }
 
 
-    public void doConsume() {}
+    public void performConsume() {}
 
 
     public void spread() {}

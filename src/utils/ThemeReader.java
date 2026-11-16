@@ -29,17 +29,18 @@ public class ThemeReader {
                 this.worldSize = Integer.parseInt(line);
             } else {
                 String[] parts = line.split(" ");
-                int count;
+                String actorName = parts[0].toLowerCase();
 
+                int count;
                 if (line.contains("-")) {
                     Random random = new Random();
                     String[] bounds = parts[1].split("-");
-                    count = random.nextInt(Integer.parseInt(bounds[0]), Integer.parseInt(bounds[1]));
-                } else {
-                    count = Integer.parseInt(parts[1]);
-                }
+                    int lowerBound = Integer.parseInt(bounds[0]);
+                    int upperBound = Integer.parseInt(bounds[1]);
+                    count = random.nextInt(lowerBound, upperBound);
+                } else count = Integer.parseInt(parts[1]);
 
-                this.actors.put(parts[0].toLowerCase(), count);
+                this.actors.put(actorName, count);
             }
 
             counter++;

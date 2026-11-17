@@ -1,12 +1,15 @@
 package models.plants;
 
+import itumulator.world.Location;
 import itumulator.world.World;
 
 import java.util.Random;
 
 public class Grass extends Plant {
 
-    public Grass() {
+    public Grass(Location location) {
+        super(location);
+        this.location = location;
     }
 
     @Override

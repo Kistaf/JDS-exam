@@ -1,20 +1,19 @@
-package models;
+package models.entities;
 
 import itumulator.simulator.Actor;
 import itumulator.world.Location;
 
-public abstract class Entity implements Actor {
+public abstract class LivingEntity extends WorldEntity implements Actor {
     protected int age;
     protected int energy;
-    protected Location location;
     protected boolean isAlive;
+
+    public LivingEntity(Location location) {
+        super(location);
+    }
 
     public boolean isAlive() {
         return isAlive;
-    }
-
-    public Location getLocation() {
-        return location;
     }
 
     public int getAge() {

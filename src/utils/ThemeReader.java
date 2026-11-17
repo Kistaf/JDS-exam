@@ -7,14 +7,14 @@ import java.util.*;
 public class ThemeReader {
 
     private int worldSize;
-    private HashMap<String, Integer> actors;
+    private HashMap<String, Integer> modelAmounts;
     private Scanner scanner;
 
 
     public ThemeReader(String path) throws FileNotFoundException {
         this.scanner = new Scanner(new File(path));
         this.worldSize = 0;
-        this.actors = new HashMap<>();
+        this.modelAmounts = new HashMap<>();
         read();
     }
 
@@ -29,7 +29,7 @@ public class ThemeReader {
                 this.worldSize = Integer.parseInt(line);
             } else {
                 String[] parts = line.split(" ");
-                String actorName = parts[0].toLowerCase();
+                String model = parts[0].toLowerCase();
 
                 int count;
                 if (line.contains("-")) {
@@ -40,7 +40,7 @@ public class ThemeReader {
                     count = random.nextInt(lowerBound, upperBound);
                 } else count = Integer.parseInt(parts[1]);
 
-                this.actors.put(actorName, count);
+                this.modelAmounts.put(model, count);
             }
 
             counter++;
@@ -54,14 +54,14 @@ public class ThemeReader {
         return worldSize;
     }
 
-    public HashMap<String, Integer> getActors() {
-        return actors;
+    public HashMap<String, Integer> getModelAmounts() {
+        return modelAmounts;
     }
 
     @Override
     public String toString() {
         return "ThemeReader{" +
-                "actors=" + actors +
+                "actors=" + modelAmounts +
                 ", worldSize=" + worldSize +
                 '}';
     }

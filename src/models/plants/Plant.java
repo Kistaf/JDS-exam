@@ -1,10 +1,14 @@
 package models.plants;
 
+import itumulator.world.Location;
 import itumulator.world.World;
-import models.Entity;
+import models.entities.LivingEntity;
 import itumulator.world.NonBlocking;
 
-public abstract class Plant extends Entity implements NonBlocking {
+public abstract class Plant extends LivingEntity implements NonBlocking {
+    public Plant(Location location) {
+        super(location);
+    }
     public abstract void grow();
     public abstract void spread(World world);
 }

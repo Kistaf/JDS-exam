@@ -1,9 +1,14 @@
 package models.animals;
 
 import interfaces.Consumable;
+import itumulator.world.Location;
 import itumulator.world.World;
 
 public class Rabbit extends Animal {
+
+    public Rabbit(Location location) {
+        super(location);
+    }
 
     @Override
     public void act(World world) {

@@ -9,6 +9,5 @@ public abstract class Plant extends LivingEntity implements NonBlocking {
     public Plant(Location location) {
         super(location);
     }
-    public abstract void grow();
     public abstract void spread(World world);
 }

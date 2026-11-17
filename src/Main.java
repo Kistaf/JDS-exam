@@ -7,6 +7,7 @@ import itumulator.executable.Program;
 import itumulator.world.Location;
 import itumulator.world.World;
 import models.animals.Rabbit;
+import models.entities.LivingEntity;
 import models.entities.WorldEntity;
 import models.plants.Grass;
 import utils.ThemeReader;
@@ -15,7 +16,8 @@ public class Main {
 
     public static void main(String[] args) {
         try {
-            ThemeReader reader = new ThemeReader("resources/tema/tema1/week-1/t1-1c.txt");
+            ThemeReader reader = new ThemeReader("resources/tema/tema1/week-1/t1-1a.txt");
+            System.out.println(reader);
 
             Program p = new Program(reader.getWorldSize(), 800, 75);
             World w = p.getWorld();

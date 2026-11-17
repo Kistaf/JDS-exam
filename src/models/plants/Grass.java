@@ -1,11 +1,12 @@
 package models.plants;
 
+import interfaces.Consumable;
 import itumulator.world.Location;
 import itumulator.world.World;
 
 import java.util.Random;
 
-public class Grass extends Plant {
+public class Grass extends Plant implements Consumable {
 
     public Grass(Location location) {
         super(location);
@@ -14,21 +15,37 @@ public class Grass extends Plant {
 
     @Override
     public void act(World world) {
-        // example of use of act() on grass
-        // random growth & only during day
-        Random random = new Random();
-        int chance = random.nextInt(0, 9);
-        if (chance % 3 == 0 && world.isDay()) this.grow();
+
     }
 
     @Override
-    public void grow() {
-
+    public void setAge() {
     }
+
+    @Override
+    public void setEnergy(int energyAddition) {
+        int maxEnergy = this.energy * this.age;
+        if (energy + energyAddition >= maxEnergy) return;
+        this.energy += energyAddition;
+    }
+
 
     @Override
     public void spread(World world) {
-
     }
 
+
+    @Override
+    public boolean isConsumable() {
+        return true;
+    }
+
+    @Override
+    public void beConsumed() {
+    }
+
+    @Override
+    public int getEnergyValue() {
+        return this.energy;
+    }
 }

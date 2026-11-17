@@ -16,13 +16,10 @@ public class Borrow extends StructureEntity implements NonBlocking {
         this.rabbits = new ArrayList<>();
     }
 
-    public List<Rabbit> getRabbit() {
+    public List<Rabbit> getRabbits() {
         return rabbits;
     }
 
-    public void setRabbits(List<Rabbit> rabbits) {
-        this.rabbits = rabbits;
-    }
-
+    public void addRabbit() {}
 
 }

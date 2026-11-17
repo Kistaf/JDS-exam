@@ -20,7 +20,15 @@ public abstract class LivingEntity extends WorldEntity implements Actor {
         return age;
     }
 
+    public abstract void setAge();
+
     public int getEnergy() {
         return energy;
+    }
+
+    public abstract void setEnergy(int energyAddition);
+
+    public void die() {
+        this.isAlive = false;
     }
 }

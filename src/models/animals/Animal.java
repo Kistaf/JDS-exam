@@ -6,7 +6,7 @@ import models.entities.LivingEntity;
 import interfaces.Consumable;
 import interfaces.Reproducible;
 
-public abstract class Animal extends LivingEntity implements Consumable {
+public abstract class Animal extends LivingEntity {
     public Animal(Location location) {
         super(location);
     }

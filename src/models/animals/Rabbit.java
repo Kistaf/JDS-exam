@@ -49,21 +49,6 @@ public class Rabbit extends Animal implements Reproducible {
     }
 
     @Override
-    public boolean isConsumable() {
-        return false;
-    }
-
-    @Override
-    public void beConsumed() {
-
-    }
-
-    @Override
-    public int getEnergyValue() {
-        return 0;
-    }
-
-    @Override
     public void reproduce(World world) {
 
     }

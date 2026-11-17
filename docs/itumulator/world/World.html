@@ -136,7 +136,7 @@ loadScripts(document, 'script');</script>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#delete(java.lang.Object)" class="member-name-link">delete</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;object)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Completely removes an object from the world, both from the map and the world's entity list.</div>
+<div class="block">Completely removes an object from the world, both from the map and the world's models list.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>&lt;T&gt;&nbsp;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;T&gt;</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getAll(java.lang.Class,java.util.Collection)" class="member-name-link">getAll</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;T&gt;&nbsp;type,
@@ -513,7 +513,7 @@ loadScripts(document, 'script');</script>
 <div class="block">Removes an object from its current location on the map, but retains its existence in the world. 
  This method is particularly useful for temporarily 'hiding' an object from the map without 
  deleting it (if an actor, its act method will continuously be called). 
- Note: this does not delete the object from the world's entity list. Furthermore, remove does not update the current location. Thus, calling overloaded methods
+ Note: this does not delete the object from the world's models list. Furthermore, remove does not update the current location. Thus, calling overloaded methods
  (e.g., <a href="#getEmptySurroundingTiles()"><code>getEmptySurroundingTiles()</code></a>) will still provide the tiles surrounding the location you removed from.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
@@ -528,10 +528,10 @@ loadScripts(document, 'script');</script>
 <section class="detail" id="delete(java.lang.Object)">
 <h3>delete</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">delete</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;object)</span></div>
-<div class="block">Completely removes an object from the world, both from the map and the world's entity list. 
+<div class="block">Completely removes an object from the world, both from the map and the world's models list.
  This method is used when an object is no longer needed in the simulation and should be 
  permanently deleted. If the object is currently on the map, it is first removed using
- <a href="#remove(java.lang.Object)"><code>remove(Object)</code></a> method. Then, the object is removed from the world's entity list,
+ <a href="#remove(java.lang.Object)"><code>remove(Object)</code></a> method. Then, the object is removed from the world's models list,
  ensuring that it no longer exists within the world context.</div>
 <dl class="notes">
 <dt>Parameters:</dt>

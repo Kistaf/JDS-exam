@@ -1,55 +1,37 @@
 package models.animals;
 
-import interfaces.Consumable;
-import interfaces.Reproducible;
 import itumulator.world.Location;
 import itumulator.world.World;
 import models.structures.Borrow;
 
-public class Rabbit extends Animal implements Reproducible {
+public class Rabbit extends Animal {
     private Borrow borrow;
 
-    public Rabbit(Location location) {
-        super(location);
-    }
-
-
-
-    @Override
-    public void act(World world) {
-
+    public Rabbit(int startEnergy) {
+        super(startEnergy);
     }
 
     @Override
-    public void setAge() {
-
+    protected void actDay(World world) {
+        this.performRandomMove(world);
     }
 
     @Override
-    public void setEnergy(int energyAddition) {
+    protected void actNight(World world) {
 
     }
 
-    public void seekBorrow(World world) {}
-
-    public void createBorrow(World world) {}
-
-    public void enterBorrow(World world, Borrow borrow) {}
-
-    public void eat(Consumable food){
-        if (food.isConsumable() && !food.equals(this)) { // make sure we don't consume ourselves
-            this.energy += food.getEnergyValue();
-            food.beConsumed();
-        }
+    private void sleep(World world) {
+        Location sleepingSpot = this.locateSleepingSpot(world);
+        if (sleepingSpot == null) return;
     }
 
-    @Override
-    public void sleep() {
+    private void attemptBorrowDigging(World world, Location location) {}
 
-    }
+    private void attemptReproduction(World world, Location location) {}
 
-    @Override
-    public void reproduce(World world) {
-
+    private Location locateSleepingSpot(World world) {
+        if (this.borrow == null) return null;
+        return world.getLocation(this.borrow);
     }
 }

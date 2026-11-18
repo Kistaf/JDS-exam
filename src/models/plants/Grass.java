@@ -1,49 +1,28 @@
 package models.plants;
 
 import interfaces.Consumable;
+import itumulator.simulator.Actor;
 import itumulator.world.Location;
 import itumulator.world.World;
 
 import java.util.Random;
 
-public class Grass extends Plant implements Consumable {
+public class Grass implements Actor, Consumable {
+    private int energy = 10;
 
-    public Grass(Location location) {
-        super(location);
-        this.location = location;
+    public Grass() {
+    }
+
+    public Grass(int initialEnergy) {
+        this.energy = initialEnergy;
     }
 
     @Override
     public void act(World world) {
-
+        this.spread(world);
     }
 
-    @Override
-    public void setAge() {
-    }
-
-    @Override
-    public void setEnergy(int energyAddition) {
-        int maxEnergy = this.energy * this.age;
-        if (energy + energyAddition >= maxEnergy) return;
-        this.energy += energyAddition;
-    }
-
-
-    @Override
-    public void spread(World world) {
-        if(world.isTileEmpty(location));
-    }
-
-
-    @Override
-    public boolean isConsumable() {
-        return true;
-    }
-
-    @Override
-    public void beConsumed() {
-    }
+    private void spread(World world) {}
 
     @Override
     public int getEnergyValue() {

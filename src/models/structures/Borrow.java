@@ -1,18 +1,15 @@
 package models.structures;
 
-import itumulator.world.Location;
-import models.entities.StructureEntity;
 import models.animals.Rabbit;
 import itumulator.world.NonBlocking;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Borrow extends StructureEntity implements NonBlocking {
-    private List<Rabbit> rabbits;
+public class Borrow implements NonBlocking {
+    private final List<Rabbit> rabbits;
 
-    public Borrow(Location location) {
-        super(location);
+    public Borrow() {
         this.rabbits = new ArrayList<>();
     }
 
@@ -20,9 +17,8 @@ public class Borrow extends StructureEntity implements NonBlocking {
         return rabbits;
     }
 
-    public void addRabbit(Rabbit rabbit) {
-        rabbits.add(rabbit);
-    }
+    public void addRabbit(Rabbit rabbit) {}
 
+    public void removeRabbit(Rabbit rabbit) {}
 
 }

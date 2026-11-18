@@ -8,6 +8,7 @@ import itumulator.world.Location;
 import itumulator.world.World;
 import models.animals.Rabbit;
 import models.plants.Grass;
+import models.structures.Borrow;
 import utils.ThemeReader;
 
 public class Main {

@@ -6,10 +6,6 @@ import itumulator.executable.DisplayInformation;
 import itumulator.executable.Program;
 import itumulator.world.Location;
 import itumulator.world.World;
-import models.animals.Rabbit;
-import models.entities.LivingEntity;
-import models.entities.WorldEntity;
-import models.plants.Grass;
 import models.structures.Burrow;
 import utils.ThemeReader;
 
@@ -17,7 +13,7 @@ public class BurrowTest {
 
     public static void main(String[] args) {
         try {
-            ThemeReader reader = new ThemeReader("resources/tema/tema1/week-1/borrowTest.txt");
+            ThemeReader reader = new ThemeReader("resources/tema/tema1/week-1/burrowTest.txt");
             System.out.println(reader);
 
             Program p = new Program(reader.getWorldSize(), 800, 75);
@@ -39,7 +35,7 @@ public class BurrowTest {
                         location = new Location(x, y);
                     }
 
-                    if(model.equalsIgnoreCase("borrow")){
+                    if(model.equalsIgnoreCase("burrow")){
                         w.setTile(location, new Burrow(location));
                     }
                 }

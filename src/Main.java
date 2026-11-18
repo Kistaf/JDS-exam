@@ -8,7 +8,7 @@ import itumulator.world.Location;
 import itumulator.world.World;
 import models.animals.Rabbit;
 import models.plants.Grass;
-import models.structures.Borrow;
+import models.structures.Burrow;
 import utils.ThemeReader;
 
 public class Main {
@@ -44,6 +44,9 @@ public class Main {
                     } else if (model.equalsIgnoreCase("grass")) {
                         Grass grass = new Grass();
                         w.setTile(location, grass);
+                    }else if (model.equalsIgnoreCase("burrow")) {
+                        Burrow burrow = new Burrow(location);
+                        w.setTile(location, burrow);
                     }
                 }
             }

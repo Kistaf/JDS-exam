@@ -2,10 +2,10 @@ package models.animals;
 
 import itumulator.world.Location;
 import itumulator.world.World;
-import models.structures.Borrow;
+import models.structures.Burrow;
 
 public class Rabbit extends Animal {
-    private Borrow borrow;
+    private Burrow borrow;
 
     public Rabbit(int startEnergy) {
         super(startEnergy);

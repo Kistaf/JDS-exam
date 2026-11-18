@@ -10,6 +10,7 @@ import models.animals.Rabbit;
 import models.entities.LivingEntity;
 import models.entities.WorldEntity;
 import models.plants.Grass;
+import models.structures.Borrow;
 import utils.ThemeReader;
 
 public class Main {

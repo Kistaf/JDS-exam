@@ -20,6 +20,9 @@ public class Borrow extends StructureEntity implements NonBlocking {
         return rabbits;
     }
 
-    public void addRabbit() {}
+    public void addRabbit(Rabbit rabbit) {
+        rabbits.add(rabbit);
+    }
+
 
 }

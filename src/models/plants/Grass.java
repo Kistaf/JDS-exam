@@ -32,6 +32,7 @@ public class Grass extends Plant implements Consumable {
 
     @Override
     public void spread(World world) {
+        if(world.isTileEmpty(location));
     }
 
 

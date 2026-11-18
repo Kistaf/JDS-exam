@@ -6,10 +6,10 @@ import itumulator.world.NonBlocking;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Borrow implements NonBlocking {
+public class Burrow implements NonBlocking {
     private final List<Rabbit> rabbits;
 
-    public Borrow() {
+    public Burrow() {
         this.rabbits = new ArrayList<>();
     }
 

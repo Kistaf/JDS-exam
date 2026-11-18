@@ -10,10 +10,10 @@ import models.animals.Rabbit;
 import models.entities.LivingEntity;
 import models.entities.WorldEntity;
 import models.plants.Grass;
-import models.structures.Borrow;
+import models.structures.Burrow;
 import utils.ThemeReader;
 
-public class BorrowTest {
+public class BurrowTest {
 
     public static void main(String[] args) {
         try {
@@ -25,7 +25,7 @@ public class BorrowTest {
             Random random = new Random();
 
             DisplayInformation holeDI = new DisplayInformation(Color.red, "hole-small");
-            p.setDisplayInformation(Borrow.class, holeDI);
+            p.setDisplayInformation(Burrow.class, holeDI);
 
             for (String model : reader.getModelAmounts().keySet()) {
                 for (int i = 0; i < reader.getModelAmounts().get(model); i++) {
@@ -40,7 +40,7 @@ public class BorrowTest {
                     }
 
                     if(model.equalsIgnoreCase("borrow")){
-                        w.setTile(location, new Borrow(location));
+                        w.setTile(location, new Burrow(location));
                     }
                 }
             }

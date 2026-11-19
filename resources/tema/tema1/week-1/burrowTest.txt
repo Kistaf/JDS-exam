@@ -1,2 +1,2 @@
 10
-borrow 10
+burrow 10

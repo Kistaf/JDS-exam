@@ -6,10 +6,6 @@ import itumulator.executable.DisplayInformation;
 import itumulator.executable.Program;
 import itumulator.world.Location;
 import itumulator.world.World;
-import models.animals.Rabbit;
-import models.entities.LivingEntity;
-import models.entities.WorldEntity;
-import models.plants.Grass;
 import models.structures.Borrow;
 import utils.ThemeReader;
 
@@ -40,7 +36,7 @@ public class BorrowTest {
                     }
 
                     if(model.equalsIgnoreCase("borrow")){
-                        w.setTile(location, new Borrow(location));
+                        w.setTile(location, new Borrow());
                     }
                 }
             }

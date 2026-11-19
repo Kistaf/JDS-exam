@@ -1,6 +1,5 @@
 import java.awt.*;
 import java.io.FileNotFoundException;
-import java.util.Random;
 
 import itumulator.executable.DisplayInformation;
 import itumulator.executable.Program;
@@ -16,7 +15,7 @@ public class Main {
 
     public static void main(String[] args) {
         try {
-            ThemeReader reader = new ThemeReader("resources/tema/tema1/week-1/t1-1a.txt");
+            ThemeReader reader = new ThemeReader("resources/tema/tema1/week-1/t1-1c.txt");
 
             Program p = new Program(reader.getWorldSize(), 800, 400);
             World w = p.getWorld();

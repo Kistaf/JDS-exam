@@ -3,11 +3,13 @@ package models.animals;
 import interfaces.Consumable;
 import itumulator.world.Location;
 import itumulator.world.World;
+import models.plants.Grass;
 import models.structures.Burrow;
-import utils.Helpers;
+import utils.CollectionUtils;
 import utils.LocationUtils;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -15,98 +17,129 @@ import java.util.stream.Collectors;
 public class Rabbit extends Animal {
     private Burrow burrow;
     private Location sleepingSpot;
-
-    private final int REPRODUCTION_ENERGY_MIN = 30;
+    private final double MIN_ENERGY = 10;
+    private final double BASE_ENERGY = 20;
+    private final double MAX_AGE = 50;
+    private final double REPRODUCTION_ENERGY_MIN = 10;
 
     public Rabbit() {
+        this.energy = BASE_ENERGY;
     }
 
-    public Rabbit(int startEnergy) {
-        super(startEnergy);
+    @Override
+    public void act(World world) {
+        if (!world.contains(this)) return;
+        if (!world.isOnTile(this) && this.sleepingSpot != null) {
+            if (world.isDay()) this.attemptWakeUp(world);
+            return;
+        }
+        super.act(world);
     }
 
     @Override
     protected void performDayTasks(World world) {
-        if (!world.isOnTile(this)) {
-            this.wakeUp(world);
-            return;
-        }
+        Location currentLoc = world.getCurrentLocation();
 
-        this.performRandomMove(world);
-        this.attemptEating(world);
-        this.attemptReproduction(world, world.getCurrentLocation());
+        Random random = new Random();
+        int roll = random.nextInt(0, 10);
+
+        if (roll % 2 == 0) {
+            Location target = this.computeRandomTargetLocation(world, List.of(Rabbit.class));
+            if (target == null) return;
+            Location nextMove = LocationUtils.greedyBest(world, currentLoc, target);
+            if (nextMove == null) return;
+            this.performMoveTowardsTarget(world, nextMove);
+        } else if (roll % 3 == 0) {
+            Location grassTarget = this.computeRandomTargetLocation(world, List.of(Grass.class));
+            if (grassTarget == null) this.performRandomMove(world);
+            else this.performMoveTowardsTarget(world, grassTarget);
+        } else this.performRandomMove(world);
+
+        this.attemptReproduction(world, currentLoc);
+        this.performEat(world);
     }
 
     @Override
     protected void performNightTasks(World world) {
-        Location currentLoc = world.getCurrentLocation();
         if (!world.isOnTile(this)) return;
-        if (world.containsNonBlocking(currentLoc) && world.getTile(currentLoc) instanceof Burrow) {
+        Location currentLoc = world.getCurrentLocation();
+
+        // borrow another rabbits burrow for the night
+        if (world.containsNonBlocking(currentLoc) && world.getNonBlocking(currentLoc) instanceof Burrow) {
             this.performSleep(world, currentLoc);
             return;
         }
 
-        if (this.burrow == null && !world.containsNonBlocking(currentLoc)) {
-            this.attemptBurrowDigging(world);
-            return;
+        // walk towards own burrow
+        Random random = new Random();
+        boolean success = random.nextInt(0, 2) == 1;
+        if (this.burrow != null && success) {
+            Location burrowLocation = this.locateBurrow(world);
+            Location bestNextTile = LocationUtils.greedyBest(world, currentLoc, burrowLocation);
+            if (bestNextTile == null || !world.isTileEmpty(bestNextTile)) return;
+            world.move(this, bestNextTile);
+            world.setCurrentLocation(bestNextTile);
+        } else {
+            this.performRandomMove(world);
         }
 
-        Location burrowLocation = this.locateBurrow(world);
-        if (burrowLocation == null) this.performRandomMove(world);
-        // calculate the next tile in the straightest path to the burrow
-        // move to that tile
-        //
+        if (this.burrow == null) this.attemptBurrowDigging(world);
+
     }
 
-    private void attemptEating(World world) {
-        if (this.energy == this.maxEnergy()) return;
+    @Override
+    public void performEat(World world) {
+        if (this.energy >= this.maxEnergy()) return;
 
         Location currentLoc = world.getCurrentLocation();
         Object nonBlockingObj = world.getNonBlocking(currentLoc);
         if (nonBlockingObj == null) return;
-        if (nonBlockingObj instanceof Consumable) {
-            // TODO: change out for consume method on interface
-            this.increaseEnergy(((Consumable) nonBlockingObj).getEnergyValue());
-            world.delete(nonBlockingObj);
+        if (nonBlockingObj instanceof Consumable food) {
+            int energyGain = food.getEnergyValue();
+            if (!food.consumableBy().contains(Rabbit.class)) return;
+            food.consume(world);
+            this.increaseEnergy(energyGain);
         }
+    }
 
+    @Override
+    protected double maxEnergy() {
+        return Math.max(this.MIN_ENERGY, this.BASE_ENERGY - this.age);
+    }
+
+    @Override
+    protected double maxAge() {
+        return this.MAX_AGE;
     }
 
 
     private void attemptBurrowDigging(World world) {
         Location currentLoc = world.getCurrentLocation();
+        if (world.containsNonBlocking(currentLoc)) return;
         Random random = new Random();
-        boolean success = random.nextInt(1, 10) == 5;
+        boolean success = random.nextInt(1, 12) == 5;
         if (!success) return;
+        this.performBurrowDigging(world, currentLoc);
+    }
 
-        Burrow burrow = new Burrow(currentLoc);
+    public void performBurrowDigging(World world, Location currentLoc) {
+        Burrow burrow = new Burrow();
         world.setTile(currentLoc, burrow);
-
         this.burrow = burrow;
         this.performSleep(world, currentLoc);
     }
 
-    private void attemptReproduction(World world, Location location) {
-        if (this.energy < REPRODUCTION_ENERGY_MIN) return;
-        Set<Animal> closeByRabbits = this.sameSpeciesNearby(world, location);
-        Rabbit mate = (Rabbit) Helpers.randomSetElement(closeByRabbits);
-        if (mate == null || mate.energy < REPRODUCTION_ENERGY_MIN) return;
-
-        Rabbit baby = new Rabbit(10);
-        Location babyLoc = LocationUtils.randomSurroundingFreeTile(world);
-        world.setTile(babyLoc, baby);
-
-        this.decreaseEnergy(10);
-        mate.decreaseEnergy(10);
-    }
-
-    private Location locateBurrow(World world) {
+    public Location locateBurrow(World world) {
         if (this.burrow == null) return null;
         return world.getLocation(this.burrow);
     }
 
+    public void setSleepingSpot(Location location) {
+        this.sleepingSpot = location;
+    }
 
-    private void wakeUp(World world) {
+
+    private void attemptWakeUp(World world) {
         Location sleepingSpot = this.sleepingSpot;
         // priority:
         // 1: burrow where they went to sleep
@@ -115,13 +148,13 @@ public class Rabbit extends Animal {
         // 4: Wait for next daily cycle.
 
         // handle if burrow spot exists & currently has no blocking entity on it
-        if (sleepingSpot != null && world.isTileEmpty(sleepingSpot)) {
+        if (world.isTileEmpty(sleepingSpot)) {
             this.performWakeUp(world, sleepingSpot);
             return;
         }
 
-        Set<Location> mapBurrows = world.getEntities().entrySet().stream()
-                .filter(entity -> entity.getKey().getClass() == Burrow.class)
+        Set<Location> mapBurrows = world.getEntities().keySet().stream()
+                .filter(entity -> entity.getClass() == Burrow.class)
                 .map(world::getLocation)
                 .collect(Collectors.toSet());
 
@@ -130,7 +163,8 @@ public class Rabbit extends Animal {
             Set<Location> triedLocs = new HashSet<>();
             while (triedLocs.size() != mapBurrows.size()) {
                 mapBurrows.removeIf(triedLocs::contains);
-                Location randomLoc = Helpers.randomSetElement(mapBurrows);
+                Location randomLoc = CollectionUtils.randomSetElement(mapBurrows);
+                if (randomLoc == null) continue;
                 triedLocs.add(randomLoc);
 
                 if (world.isTileEmpty(randomLoc)) {
@@ -147,15 +181,32 @@ public class Rabbit extends Animal {
         this.performWakeUp(world, lastResortLocation);
     }
 
-    private void performSleep(World world, Location sleepingSpot) {
-        this.sleepingSpot = sleepingSpot;
+    public void attemptReproduction(World world, Location location) {
+        Random random = new Random();
+        if (energy < 0.5 * this.maxEnergy() || random.nextDouble() >= 0.10 || this.energy < this.REPRODUCTION_ENERGY_MIN) return;
+
+        Set<Animal> closeByRabbits = this.sameSpeciesNearby(world, location);
+        Rabbit mate = (Rabbit) CollectionUtils.randomSetElement(closeByRabbits);
+        if (mate == null || mate == this || mate.energy < this.REPRODUCTION_ENERGY_MIN) return;
+
+        Rabbit baby = new Rabbit();
+        Location babyLoc = LocationUtils.randomFreeTile(world);
+        world.setTile(babyLoc, baby);
+
+        this.decreaseEnergy(5);
+        mate.decreaseEnergy(5);
+    }
+
+
+    public void performSleep(World world, Location sleepingSpot) {
+        this.setSleepingSpot(sleepingSpot);
         world.remove(this);
     }
 
-    private void performWakeUp(World world, Location location) {
+    public void performWakeUp(World world, Location location) {
         world.setCurrentLocation(location);
         world.setTile(location, this);
         this.increaseEnergy(5);
-        this.sleepingSpot = null;
+        this.setSleepingSpot(null);
     }
 }

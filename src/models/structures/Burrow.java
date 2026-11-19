@@ -8,17 +8,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Burrow implements NonBlocking {
-    private Location location;
     private List<Rabbit> boundRabbits;
     private Tunnel tunnel;
 
-    public Burrow(Location location) {
-        this.location = location;
+    public Burrow() {
         boundRabbits = new ArrayList<>();
         tunnel = null;
     }
-
-    public Location getLocation() { return location; }
 
     public List<Rabbit> getRabbits() { return boundRabbits; }
 
@@ -39,4 +35,5 @@ public class Burrow implements NonBlocking {
     public void setTunnel(Tunnel tunnel) {
         this.tunnel = tunnel;
     }
+
 }

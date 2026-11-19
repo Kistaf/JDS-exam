@@ -12,7 +12,27 @@ class RabbitTest {
     }
 
     @Test
-    void locateBurrow() {
+    void act() {
+    }
+
+    @Test
+    void performDayTasks() {
+    }
+
+    @Test
+    void performNightTasks() {
+    }
+
+    @Test
+    void performEat() {
+    }
+
+    @Test
+    void maxEnergy() {
+    }
+
+    @Test
+    void maxAge() {
     }
 
     @Test
@@ -20,11 +40,15 @@ class RabbitTest {
     }
 
     @Test
-    void attemptReproduction() {
+    void locateBurrow() {
     }
 
     @Test
-    void testLocateBurrow() {
+    void setSleepingSpot() {
+    }
+
+    @Test
+    void attemptReproduction() {
     }
 
     @Test

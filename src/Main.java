@@ -10,6 +10,7 @@ import models.animals.Rabbit;
 import models.plants.Grass;
 import models.structures.Borrow;
 import utils.LocationUtils;
+import models.structures.Burrow;
 import utils.ThemeReader;
 
 public class Main {
@@ -37,11 +38,11 @@ public class Main {
                         Rabbit rabbit = new Rabbit(10);
                         w.setTile(location, rabbit);
                     } else if (model.equalsIgnoreCase("grass")) {
-                        Grass grass = new Grass(5);
+                        Grass grass = new Grass(10,location);
                         w.setTile(location, grass);
-                    } else if (model.equalsIgnoreCase("borrow")) {
-                        Borrow borrow = new Borrow();
-                        w.setTile(location, borrow);
+                    }else if (model.equalsIgnoreCase("burrow")) {
+                        Burrow burrow = new Burrow(location);
+                        w.setTile(location, burrow);
                     }
                 }
             }

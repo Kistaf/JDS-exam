@@ -8,6 +8,7 @@ import itumulator.world.World;
 import models.animals.Rabbit;
 import models.plants.Grass;
 import models.structures.Burrow;
+import models.utils.ThemeReaderModel;
 import utils.LocationUtils;
 import utils.ThemeReader;
 
@@ -27,20 +28,36 @@ public class Main {
             p.setDisplayInformation(Grass.class, d1);
             p.setDisplayInformation(Burrow.class, d3);
 
-            for (String model : reader.getModelAmounts().keySet()) {
-                for (int i = 0; i < reader.getModelAmounts().get(model); i++) {
-                    Location location = LocationUtils.randomFreeTile(w);
-                    if (location == null) continue;
+            for (ThemeReaderModel model : reader.getModels()) {
+                if (model.getName().equalsIgnoreCase("wolf")) {
+                    for (int i = 0; i < model.getCount(); i++) {
+                        // handle pack spawning
+                    }
+                } else {
+                    for (int i = 0; i < model.getCount(); i++) {
+                        Location randomLoc = LocationUtils.randomFreeTile(w);
+                        if (randomLoc == null) continue;
 
-                    if (model.equalsIgnoreCase("rabbit")) {
-                        Rabbit rabbit = new Rabbit(10);
-                        w.setTile(location, rabbit);
-                    } else if (model.equalsIgnoreCase("grass")) {
-                        Grass grass = new Grass(10,location);
-                        w.setTile(location, grass);
-                    }else if (model.equalsIgnoreCase("burrow")) {
-                        Burrow burrow = new Burrow(location);
-                        w.setTile(location, burrow);
+                        if (model.getName().equalsIgnoreCase("bear")) {
+                            Location predefinedLoc = model.getLoc();
+                            if (predefinedLoc == null) {
+                                // use randomLoc
+                            } else {
+                                // use predefinedLoc
+                            }
+                        } else if (model.getName().equalsIgnoreCase("rabbit")) {
+                            Rabbit rabbit = new Rabbit();
+                            w.setTile(randomLoc, rabbit);
+                        } else if (model.getName().equalsIgnoreCase("grass")) {
+                            Grass grass = new Grass(5);
+                            w.setTile(randomLoc, grass);
+                        } else if (model.getName().equalsIgnoreCase("berry")) {
+                            // probably randomly decide if it should be a blue- or raspberry bush
+
+                        } else if (model.getName().equalsIgnoreCase("burrow")) {
+                            Burrow burrow = new Burrow(randomLoc);
+                            w.setTile(randomLoc, burrow);
+                        }
                     }
                 }
             }

@@ -12,23 +12,15 @@ public abstract class Animal implements Actor {
     protected double age = 0;
     protected double energy;
 
-    private final double MAX_AGE = 30;
-    private final double BASE_ENERGY = 15;
-    private final double MIN_ENERGY = 0;
-
     protected Animal() {}
-
-    protected Animal(int startEnergy) {
-        this.energy = startEnergy;
-    }
 
     @Override
     public void act(World world) {
         if (world.isDay()) this.performDayTasks(world);
         else this.performNightTasks(world);
 
-        age += 0.1;
-        this.energy -= 0.1;
+        age += 0.25;
+        this.decreaseEnergy(0.25);
         if (!world.contains(this)) return;
         if (age >= this.maxAge() || energy <= 0) this.onDeath(world);
     }
@@ -37,6 +29,8 @@ public abstract class Animal implements Actor {
 
     protected abstract void performNightTasks(World world);
 
+    protected abstract void performEat(World world);
+
     protected void performRandomMove(World world) {
         Location newLocation = LocationUtils.randomSurroundingFreeTile(world);
         world.move(this, newLocation);
@@ -44,20 +38,16 @@ public abstract class Animal implements Actor {
     }
 
     protected void decreaseEnergy(double decreaseBy) {
-        this.energy -= Math.min(0, this.energy - decreaseBy);
+        this.energy -= Math.max(0, this.energy - decreaseBy);
     }
 
     protected void increaseEnergy(double increaseBy) {
-        this.energy += Math.max(this.maxEnergy(), this.energy + increaseBy);
+        this.energy += Math.min(this.maxEnergy(), this.energy + increaseBy);
     }
 
-    protected double maxEnergy() {
-        return Math.min(this.MIN_ENERGY, this.BASE_ENERGY - this.age);
-    }
+    protected abstract double maxEnergy();
 
-    protected double maxAge() {
-        return this.MAX_AGE;
-    }
+    protected abstract double maxAge();
 
 
     protected void onDeath(World world) {

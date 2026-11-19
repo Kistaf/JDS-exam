@@ -12,4 +12,19 @@ public class Bear extends Animal {
     protected void performNightTasks(World world) {
 
     }
+
+    @Override
+    protected void performEat(World world) {
+
+    }
+
+    @Override
+    protected double maxEnergy() {
+        return 0;
+    }
+
+    @Override
+    protected double maxAge() {
+        return 0;
+    }
 }

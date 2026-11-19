@@ -5,47 +5,54 @@ import itumulator.simulator.Actor;
 import itumulator.world.Location;
 import itumulator.world.NonBlocking;
 import itumulator.world.World;
+import models.animals.Rabbit;
+import utils.LocationUtils;
 
-
-
+import java.util.List;
 import java.util.Random;
 import java.util.random.RandomGenerator;
 
 public class Grass implements Actor, Consumable, NonBlocking {
     private int energy = 10;
-    private Location location;
 
-    public Grass(int initialEnergy, Location location) {
+    public Grass(int initialEnergy) {
         this.energy = initialEnergy;
-        this.location = location;
     }
 
     @Override
     public void act(World world) {
-
+        attemptSpread(world);
     }
 
-    private void spread(World world) {
-
+    private void attemptSpread(World world) {
         Random random = new Random();
-        int x = random.nextInt(world.getSize());
-        int y = random.nextInt(world.getSize());
+        boolean success = random.nextInt(0, 75) == 10;
+        if (success) spread(world);
+    }
 
-        Location location = new Location(x, y);
-        while (!world.isTileEmpty(location) || world.containsNonBlocking(location)) {
-            x = random.nextInt(world.getSize());
-            y = random.nextInt(world.getSize());
-            location = new Location(x, y);
-        }
-        if (world.isDay()) {
-            if (world.isTileEmpty(location)) {
-                world.setTile(location, new Grass(10, location));
-            }
+    public void spread(World world) {
+        Location spreadLoc = LocationUtils.randomSurroundingFreeTile(world);
+        if (spreadLoc == null) return;
+        if (world.isDay() && !world.containsNonBlocking(spreadLoc)) {
+            world.setTile(spreadLoc, new Grass(2));
         }
     }
-        @Override
-        public int getEnergyValue() {
-            return this.energy;
-        }
+
+    @Override
+    public int getEnergyValue() {
+        return this.energy;
     }
+
+    @Override
+    public int consume(World world) {
+        int providedEnergy = this.energy;
+        world.delete(this);
+        return providedEnergy;
+    }
+
+    @Override
+    public List<Object> consumableBy() {
+        return List.of(Rabbit.class);
+    }
+}
 

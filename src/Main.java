@@ -27,7 +27,7 @@ public class Main {
             DisplayInformation d3 = new DisplayInformation(Color.blue, "hole");
             p.setDisplayInformation(Rabbit.class, d2);
             p.setDisplayInformation(Grass.class, d1);
-            p.setDisplayInformation(Borrow.class, d3);
+            p.setDisplayInformation(Burrow.class, d3);
 
             for (String model : reader.getModelAmounts().keySet()) {
                 for (int i = 0; i < reader.getModelAmounts().get(model); i++) {

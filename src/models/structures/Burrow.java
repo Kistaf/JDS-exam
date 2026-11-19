@@ -1,6 +1,8 @@
 package models.structures;
 
+import itumulator.simulator.Actor;
 import itumulator.world.Location;
+import itumulator.world.World;
 import models.animals.Rabbit;
 import itumulator.world.NonBlocking;
 
@@ -39,4 +41,5 @@ public class Burrow implements NonBlocking {
     public void setTunnel(Tunnel tunnel) {
         this.tunnel = tunnel;
     }
+
 }

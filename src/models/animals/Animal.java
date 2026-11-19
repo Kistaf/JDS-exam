@@ -3,7 +3,6 @@ package models.animals;
 import itumulator.simulator.Actor;
 import itumulator.world.Location;
 import itumulator.world.World;
-import models.plants.Grass;
 import utils.CollectionUtils;
 import utils.LocationUtils;
 
@@ -20,13 +19,13 @@ public abstract class Animal implements Actor {
 
     @Override
     public void act(World world) {
-        if (world.isDay()) this.performDayTasks(world);
-        else this.performNightTasks(world);
-
         age += 0.25;
         this.decreaseEnergy(0.25);
         if (!world.contains(this)) return;
         if (age >= this.maxAge() || energy <= 0) this.onDeath(world);
+
+        if (world.isDay()) this.performDayTasks(world);
+        else this.performNightTasks(world);
     }
 
     protected abstract void performDayTasks(World world);
@@ -41,9 +40,18 @@ public abstract class Animal implements Actor {
         world.setCurrentLocation(newLocation);
     }
 
+
+    public void performMoveTowardsTarget(World world, Location targetLoc) {
+        Location nextMove = LocationUtils.greedyBest(world, world.getCurrentLocation(), targetLoc);
+        if (nextMove == null) return;
+        world.move(this, nextMove);
+        world.setCurrentLocation(nextMove);
+    }
+
     protected Location computeRandomTargetLocation(World world, List<Object> targets) {
+        if (world.getEntities().isEmpty()) return null;
         Set<Location> targetTiles = world.getEntities().keySet().stream()
-                .filter(entity -> targets.contains(entity.getClass()))
+                .filter(entity -> targets.contains(entity.getClass()) && world.isOnTile(entity))
                 .map(world::getLocation)
                 .collect(Collectors.toSet());
 
@@ -76,5 +84,7 @@ public abstract class Animal implements Actor {
         }
         return animals;
     }
+
+
 
 }

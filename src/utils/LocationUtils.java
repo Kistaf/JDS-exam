@@ -32,7 +32,7 @@ public class LocationUtils {
     }
 
     // Gathered from conversation with AI on how best to approach this kind of problem.
-    public static Location greedyBestNeighbour(World world, Location from, Location to) {
+    public static Location greedyBest(World world, Location from, Location to) {
         Location best = null;
         double bestDist = Double.MAX_VALUE;
 

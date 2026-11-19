@@ -26,7 +26,7 @@ public class Grass implements Actor, Consumable, NonBlocking {
 
     private void attemptSpread(World world) {
         Random random = new Random();
-        boolean success = random.nextInt(0, 75) == 10;
+        boolean success = random.nextInt(0, 16) == 4;
         if (success) spread(world);
     }
 

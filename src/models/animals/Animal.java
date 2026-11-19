@@ -19,13 +19,14 @@ public abstract class Animal implements Actor {
 
     @Override
     public void act(World world) {
-        age += 0.25;
-        this.decreaseEnergy(0.25);
         if (!world.contains(this)) return;
-        if (age >= this.maxAge() || energy <= 0) this.onDeath(world);
 
         if (world.isDay()) this.performDayTasks(world);
         else this.performNightTasks(world);
+
+        age += 0.25;
+        this.decreaseEnergy(0.35);
+        if (age >= this.maxAge() || energy <= 0) this.die(world);
     }
 
     protected abstract void performDayTasks(World world);
@@ -36,6 +37,7 @@ public abstract class Animal implements Actor {
 
     protected void performRandomMove(World world) {
         Location newLocation = LocationUtils.randomSurroundingFreeTile(world);
+        if (newLocation == null) return;
         world.move(this, newLocation);
         world.setCurrentLocation(newLocation);
     }
@@ -43,7 +45,7 @@ public abstract class Animal implements Actor {
 
     public void performMoveTowardsTarget(World world, Location targetLoc) {
         Location nextMove = LocationUtils.greedyBest(world, world.getCurrentLocation(), targetLoc);
-        if (nextMove == null) return;
+        if (nextMove == null || !world.isTileEmpty(nextMove)) return;
         world.move(this, nextMove);
         world.setCurrentLocation(nextMove);
     }
@@ -59,11 +61,11 @@ public abstract class Animal implements Actor {
     }
 
     protected void decreaseEnergy(double decreaseBy) {
-        this.energy -= Math.max(0, this.energy - decreaseBy);
+        this.energy = Math.max(0, this.energy - decreaseBy);
     }
 
     protected void increaseEnergy(double increaseBy) {
-        this.energy += Math.min(this.maxEnergy(), this.energy + increaseBy);
+        this.energy = Math.min(this.maxEnergy(), this.energy + increaseBy);
     }
 
     protected abstract double maxEnergy();
@@ -71,18 +73,16 @@ public abstract class Animal implements Actor {
     protected abstract double maxAge();
 
 
-    protected void onDeath(World world) {
+    protected void die(World world) {
         world.delete(this);
     }
 
     protected Set<Animal> sameSpeciesNearby(World world, Location location) {
-        Set<Animal> animals = new HashSet<>();
-        for (Animal animal : world.getAll(Animal.class, world.getSurroundingTiles())) {
-            if (animal.getClass() == this.getClass() && animal != this) {
-                animals.add(animal);
-            }
+        Set<Animal> same = new HashSet<>();
+        for (Animal animal : world.getAll(Animal.class, world.getSurroundingTiles(location))) {
+            if (animal != this && animal.getClass() == getClass()) same.add(animal);
         }
-        return animals;
+        return same;
     }
 
 

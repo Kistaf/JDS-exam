@@ -13,7 +13,7 @@ import java.util.Random;
 import java.util.random.RandomGenerator;
 
 public class Grass implements Actor, Consumable, NonBlocking {
-    private int energy = 10;
+    private int energy;
 
     public Grass(int initialEnergy) {
         this.energy = initialEnergy;
@@ -44,10 +44,8 @@ public class Grass implements Actor, Consumable, NonBlocking {
     }
 
     @Override
-    public int consume(World world) {
-        int providedEnergy = this.energy;
+    public void consume(World world) {
         world.delete(this);
-        return providedEnergy;
     }
 
     @Override

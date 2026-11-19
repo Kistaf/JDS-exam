@@ -6,6 +6,6 @@ import java.util.List;
 
 public interface Consumable {
     int getEnergyValue();
-    int consume(World world);
+    void consume(World world);
     List<Object> consumableBy();
 }

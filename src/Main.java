@@ -45,17 +45,24 @@ public class Main {
                             } else {
                                 // use predefinedLoc
                             }
-                        } else if (model.getName().equalsIgnoreCase("rabbit")) {
+                        }
+
+                        if (model.getName().equalsIgnoreCase("rabbit")) {
                             Rabbit rabbit = new Rabbit();
                             w.setTile(randomLoc, rabbit);
-                        } else if (model.getName().equalsIgnoreCase("grass")) {
-                            Grass grass = new Grass(5);
-                            w.setTile(randomLoc, grass);
-                        } else if (model.getName().equalsIgnoreCase("berry")) {
-                            // probably randomly decide if it should be a blue- or raspberry bush
+                        }
 
-                        } else if (model.getName().equalsIgnoreCase("burrow")) {
-                            Burrow burrow = new Burrow(randomLoc);
+                        if (model.getName().equalsIgnoreCase("grass")) {
+                            Grass grass = new Grass(2);
+                            w.setTile(randomLoc, grass);
+                        }
+
+                        if (model.getName().equalsIgnoreCase("berry")) {
+                            // probably randomly decide if it should be a blue- or raspberry bush
+                        }
+
+                        if (model.getName().equalsIgnoreCase("burrow")) {
+                            Burrow burrow = new Burrow();
                             w.setTile(randomLoc, burrow);
                         }
                     }

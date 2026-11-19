@@ -23,7 +23,7 @@ public class LocationUtils {
         int y = random.nextInt(worldSize);
 
         Location location = new Location(x, y);
-        while (!world.isTileEmpty(location) || world.containsNonBlocking(location)) {
+        while (!world.isTileEmpty(location) && !world.containsNonBlocking(location)) {
             x = random.nextInt(worldSize);
             y = random.nextInt(worldSize);
             location = new Location(x, y);

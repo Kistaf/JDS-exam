@@ -42,7 +42,7 @@ public class Main {
                         Rabbit rabbit = new Rabbit(20);
                         w.setTile(location, rabbit);
                     } else if (model.equalsIgnoreCase("grass")) {
-                        Grass grass = new Grass();
+                        Grass grass = new Grass(10,location);
                         w.setTile(location, grass);
                     }else if (model.equalsIgnoreCase("burrow")) {
                         Burrow burrow = new Burrow(location);

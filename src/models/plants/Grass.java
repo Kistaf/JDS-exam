@@ -5,16 +5,18 @@ import itumulator.simulator.Actor;
 import itumulator.world.Location;
 import itumulator.world.World;
 
+
+
 import java.util.Random;
+import java.util.random.RandomGenerator;
 
 public class Grass implements Actor, Consumable {
     private int energy = 10;
+    private Location location;
 
-    public Grass() {
-    }
-
-    public Grass(int initialEnergy) {
+    public Grass(int initialEnergy, Location location) {
         this.energy = initialEnergy;
+        this.location = location;
     }
 
     @Override
@@ -22,10 +24,27 @@ public class Grass implements Actor, Consumable {
         this.spread(world);
     }
 
-    private void spread(World world) {}
+    private void spread(World world) {
 
-    @Override
-    public int getEnergyValue() {
-        return this.energy;
+        Random random = new Random();
+        int x = random.nextInt(world.getSize());
+        int y = random.nextInt(world.getSize());
+
+        Location location = new Location(x, y);
+        while (!world.isTileEmpty(location) || world.containsNonBlocking(location)) {
+            x = random.nextInt(world.getSize());
+            y = random.nextInt(world.getSize());
+            location = new Location(x, y);
+        }
+        if (world.isDay()) {
+            if (world.isTileEmpty(location)) {
+                world.setTile(location, new Grass(10, location));
+            }
+        }
     }
-}
+        @Override
+        public int getEnergyValue() {
+            return this.energy;
+        }
+    }
+

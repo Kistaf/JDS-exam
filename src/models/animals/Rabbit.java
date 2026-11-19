@@ -3,7 +3,7 @@ package models.animals;
 import interfaces.Consumable;
 import itumulator.world.Location;
 import itumulator.world.World;
-import models.structures.Borrow;
+import models.structures.Burrow;
 import utils.Helpers;
 import utils.LocationUtils;
 
@@ -13,7 +13,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class Rabbit extends Animal {
-    private Borrow borrow;
+    private Burrow burrow;
     private Location sleepingSpot;
 
     private final int REPRODUCTION_ENERGY_MIN = 30;
@@ -41,19 +41,19 @@ public class Rabbit extends Animal {
     protected void performNightTasks(World world) {
         Location currentLoc = world.getCurrentLocation();
         if (!world.isOnTile(this)) return;
-        if (world.containsNonBlocking(currentLoc) && world.getTile(currentLoc) instanceof Borrow) {
+        if (world.containsNonBlocking(currentLoc) && world.getTile(currentLoc) instanceof burrow) {
             this.performSleep(world, currentLoc);
             return;
         }
 
-        if (this.borrow == null && !world.containsNonBlocking(currentLoc)) {
-            this.attemptBorrowDigging(world);
+        if (this.burrow == null && !world.containsNonBlocking(currentLoc)) {
+            this.attemptburrowDigging(world);
             return;
         }
 
-        Location borrowLocation = this.locateBorrow(world);
-        if (borrowLocation == null) this.performRandomMove(world);
-        // calculate the next tile in the straightest path to the borrow
+        Location burrowLocation = this.locateburrow(world);
+        if (burrowLocation == null) this.performRandomMove(world);
+        // calculate the next tile in the straightest path to the burrow
         // move to that tile
         //
     }
@@ -73,16 +73,16 @@ public class Rabbit extends Animal {
     }
 
 
-    private void attemptBorrowDigging(World world) {
+    private void attemptburrowDigging(World world) {
         Location currentLoc = world.getCurrentLocation();
         Random random = new Random();
         boolean success = random.nextInt(1, 10) == 5;
         if (!success) return;
 
-        Borrow borrow = new Borrow();
-        world.setTile(currentLoc, borrow);
+        burrow burrow = new burrow();
+        world.setTile(currentLoc, burrow);
 
-        this.borrow = borrow;
+        this.burrow = burrow;
         this.performSleep(world, currentLoc);
     }
 
@@ -100,37 +100,37 @@ public class Rabbit extends Animal {
         mate.decreaseEnergy(10);
     }
 
-    private Location locateBorrow(World world) {
-        if (this.borrow == null) return null;
-        return world.getLocation(this.borrow);
+    private Location locateburrow(World world) {
+        if (this.burrow == null) return null;
+        return world.getLocation(this.burrow);
     }
 
 
     private void wakeUp(World world) {
         Location sleepingSpot = this.sleepingSpot;
         // priority:
-        // 1: Borrow where they went to sleep
-        // 2: Any other borrow on the map (tunnel)
+        // 1: burrow where they went to sleep
+        // 2: Any other burrow on the map (tunnel)
         // 3: Random tile as last resort.
         // 4: Wait for next daily cycle.
 
-        // handle if borrow spot exists & currently has no blocking entity on it
+        // handle if burrow spot exists & currently has no blocking entity on it
         if (sleepingSpot != null && world.isTileEmpty(sleepingSpot)) {
             this.performWakeUp(world, sleepingSpot);
             return;
         }
 
-        Set<Location> mapBorrows = world.getEntities().entrySet().stream()
-                .filter(entity -> entity.getKey().getClass() == Borrow.class)
+        Set<Location> mapburrows = world.getEntities().entrySet().stream()
+                .filter(entity -> entity.getKey().getClass() == burrow.class)
                 .map(world::getLocation)
                 .collect(Collectors.toSet());
 
-        if (!mapBorrows.isEmpty()) {
-            // spawn at any other borrow on the spawn
+        if (!mapburrows.isEmpty()) {
+            // spawn at any other burrow on the spawn
             Set<Location> triedLocs = new HashSet<>();
-            while (triedLocs.size() != mapBorrows.size()) {
-                mapBorrows.removeIf(triedLocs::contains);
-                Location randomLoc = Helpers.randomSetElement(mapBorrows);
+            while (triedLocs.size() != mapburrows.size()) {
+                mapburrows.removeIf(triedLocs::contains);
+                Location randomLoc = Helpers.randomSetElement(mapburrows);
                 triedLocs.add(randomLoc);
 
                 if (world.isTileEmpty(randomLoc)) {

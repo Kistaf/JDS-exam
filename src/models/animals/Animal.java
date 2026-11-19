@@ -66,7 +66,17 @@ public abstract class Animal implements Actor {
 
     protected Set<Animal> sameSpeciesNearby(World world, Location location) {
         Set<Animal> animals = new HashSet<>();
-        for (Animal animal : world.getAll(Animal.class, world.getSurroundingTiles())) {
+        for (Animal animal : world.getAll(Animal.class, world.getSurroundingTiles(location))) {
+            if (animal.getClass() == this.getClass() && animal != this) {
+                animals.add(animal);
+            }
+        }
+        return animals;
+    }
+
+    protected Set<Animal> sameSpeciesNearby(World world, Location location, int radius) {
+        Set<Animal> animals = new HashSet<>();
+        for (Animal animal : world.getAll(Animal.class, world.getSurroundingTiles(location, radius))) {
             if (animal.getClass() == this.getClass() && animal != this) {
                 animals.add(animal);
             }

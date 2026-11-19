@@ -41,17 +41,17 @@ public class Rabbit extends Animal {
     protected void performNightTasks(World world) {
         Location currentLoc = world.getCurrentLocation();
         if (!world.isOnTile(this)) return;
-        if (world.containsNonBlocking(currentLoc) && world.getTile(currentLoc) instanceof burrow) {
+        if (world.containsNonBlocking(currentLoc) && world.getTile(currentLoc) instanceof Burrow) {
             this.performSleep(world, currentLoc);
             return;
         }
 
         if (this.burrow == null && !world.containsNonBlocking(currentLoc)) {
-            this.attemptburrowDigging(world);
+            this.attemptBurrowDigging(world);
             return;
         }
 
-        Location burrowLocation = this.locateburrow(world);
+        Location burrowLocation = this.locateBurrow(world);
         if (burrowLocation == null) this.performRandomMove(world);
         // calculate the next tile in the straightest path to the burrow
         // move to that tile
@@ -73,13 +73,13 @@ public class Rabbit extends Animal {
     }
 
 
-    private void attemptburrowDigging(World world) {
+    private void attemptBurrowDigging(World world) {
         Location currentLoc = world.getCurrentLocation();
         Random random = new Random();
         boolean success = random.nextInt(1, 10) == 5;
         if (!success) return;
 
-        burrow burrow = new burrow();
+        Burrow burrow = new Burrow();
         world.setTile(currentLoc, burrow);
 
         this.burrow = burrow;
@@ -100,7 +100,7 @@ public class Rabbit extends Animal {
         mate.decreaseEnergy(10);
     }
 
-    private Location locateburrow(World world) {
+    private Location locateBurrow(World world) {
         if (this.burrow == null) return null;
         return world.getLocation(this.burrow);
     }
@@ -120,17 +120,17 @@ public class Rabbit extends Animal {
             return;
         }
 
-        Set<Location> mapburrows = world.getEntities().entrySet().stream()
-                .filter(entity -> entity.getKey().getClass() == burrow.class)
+        Set<Location> mapBurrows = world.getEntities().entrySet().stream()
+                .filter(entity -> entity.getKey().getClass() == Burrow.class)
                 .map(world::getLocation)
                 .collect(Collectors.toSet());
 
-        if (!mapburrows.isEmpty()) {
+        if (!mapBurrows.isEmpty()) {
             // spawn at any other burrow on the spawn
             Set<Location> triedLocs = new HashSet<>();
-            while (triedLocs.size() != mapburrows.size()) {
-                mapburrows.removeIf(triedLocs::contains);
-                Location randomLoc = Helpers.randomSetElement(mapburrows);
+            while (triedLocs.size() != mapBurrows.size()) {
+                mapBurrows.removeIf(triedLocs::contains);
+                Location randomLoc = Helpers.randomSetElement(mapBurrows);
                 triedLocs.add(randomLoc);
 
                 if (world.isTileEmpty(randomLoc)) {

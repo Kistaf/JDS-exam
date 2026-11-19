@@ -18,7 +18,7 @@ public class Main {
         try {
             ThemeReader reader = new ThemeReader("resources/tema/tema1/week-1/t1-1c.txt");
 
-            Program p = new Program(reader.getWorldSize(), 800, 400);
+            Program p = new Program(reader.getWorldSize(), 800, 1000);
             World w = p.getWorld();
 
             DisplayInformation d1 = new DisplayInformation(Color.green, "grass");

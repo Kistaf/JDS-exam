@@ -3,10 +3,14 @@ package models.animals;
 import itumulator.simulator.Actor;
 import itumulator.world.Location;
 import itumulator.world.World;
+import models.plants.Grass;
+import utils.CollectionUtils;
 import utils.LocationUtils;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public abstract class Animal implements Actor {
     protected double age = 0;
@@ -35,6 +39,15 @@ public abstract class Animal implements Actor {
         Location newLocation = LocationUtils.randomSurroundingFreeTile(world);
         world.move(this, newLocation);
         world.setCurrentLocation(newLocation);
+    }
+
+    protected Location computeRandomTargetLocation(World world, List<Object> targets) {
+        Set<Location> targetTiles = world.getEntities().keySet().stream()
+                .filter(entity -> targets.contains(entity.getClass()))
+                .map(world::getLocation)
+                .collect(Collectors.toSet());
+
+        return CollectionUtils.randomSetElement(targetTiles);
     }
 
     protected void decreaseEnergy(double decreaseBy) {

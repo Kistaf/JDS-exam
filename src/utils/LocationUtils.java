@@ -10,15 +10,24 @@ public class LocationUtils {
 
 
     public static Location randomSurroundingFreeTile(World world) {
-        Random random = new Random();
         Location currentLoc = world.getCurrentLocation();
         Set<Location> emptySurroundings = world.getEmptySurroundingTiles(currentLoc);
-        if (emptySurroundings.isEmpty()) return null;
+        return Helpers.randomSetElement(emptySurroundings);
+    }
 
-        int nextLocIdx = random.nextInt(emptySurroundings.size());
-        return emptySurroundings.stream()
-                .skip(nextLocIdx)
-                .findFirst()
-                .orElse(null);
+    public static Location randomFreeTile(World world) {
+        int worldSize = world.getSize();
+        Random random = new Random();
+
+        int x = random.nextInt(worldSize);
+        int y = random.nextInt(worldSize);
+
+        Location location = new Location(x, y);
+        while (!world.isTileEmpty(location) || world.containsNonBlocking(location)) {
+            x = random.nextInt(worldSize);
+            y = random.nextInt(worldSize);
+            location = new Location(x, y);
+        }
+        return location;
     }
 }

@@ -3,11 +3,12 @@ package models.plants;
 import interfaces.Consumable;
 import itumulator.simulator.Actor;
 import itumulator.world.Location;
+import itumulator.world.NonBlocking;
 import itumulator.world.World;
 
 import java.util.Random;
 
-public class Grass implements Actor, Consumable {
+public class Grass implements Actor, Consumable, NonBlocking {
     private int energy = 10;
 
     public Grass() {
@@ -19,7 +20,7 @@ public class Grass implements Actor, Consumable {
 
     @Override
     public void act(World world) {
-        this.spread(world);
+
     }
 
     private void spread(World world) {}
@@ -28,4 +29,5 @@ public class Grass implements Actor, Consumable {
     public int getEnergyValue() {
         return this.energy;
     }
+
 }

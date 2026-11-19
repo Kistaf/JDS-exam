@@ -16,18 +16,16 @@ public class Main {
 
     public static void main(String[] args) {
         try {
-            ThemeReader reader = new ThemeReader("resources/tema/tema1/week-1/t1-2b.txt");
-            System.out.println(reader);
+            ThemeReader reader = new ThemeReader("resources/tema/tema1/week-1/t1-1a.txt");
 
-            Program p = new Program(reader.getWorldSize(), 800, 2000);
+            Program p = new Program(reader.getWorldSize(), 800, 400);
             World w = p.getWorld();
-            Random random = new Random();
 
             DisplayInformation d1 = new DisplayInformation(Color.green, "grass");
             DisplayInformation d2 = new DisplayInformation(Color.red, "rabbit-small");
             DisplayInformation d3 = new DisplayInformation(Color.blue, "hole");
-            p.setDisplayInformation(Grass.class, d1);
             p.setDisplayInformation(Rabbit.class, d2);
+            p.setDisplayInformation(Grass.class, d1);
             p.setDisplayInformation(Borrow.class, d3);
 
             for (String model : reader.getModelAmounts().keySet()) {
@@ -39,7 +37,7 @@ public class Main {
                         Rabbit rabbit = new Rabbit(10);
                         w.setTile(location, rabbit);
                     } else if (model.equalsIgnoreCase("grass")) {
-                        Grass grass = new Grass();
+                        Grass grass = new Grass(5);
                         w.setTile(location, grass);
                     } else if (model.equalsIgnoreCase("borrow")) {
                         Borrow borrow = new Borrow();

@@ -1,5 +1,6 @@
 package models.animals;
 
+import interfaces.Consumable;
 import itumulator.world.Location;
 import itumulator.world.World;
 import models.structures.Borrow;
@@ -13,10 +14,9 @@ import java.util.stream.Collectors;
 
 public class Rabbit extends Animal {
     private Borrow borrow;
-    private boolean isSleeping = false;
     private Location sleepingSpot;
 
-    private final int REPRODUCTION_ENERGY_MIN = 15;
+    private final int REPRODUCTION_ENERGY_MIN = 30;
 
     public Rabbit() {
     }
@@ -29,11 +29,11 @@ public class Rabbit extends Animal {
     protected void performDayTasks(World world) {
         if (!world.isOnTile(this)) {
             this.wakeUp(world);
-            this.isSleeping = false;
-            this.sleepingSpot = null;
+            return;
         }
 
         this.performRandomMove(world);
+        this.attemptEating(world);
         this.attemptReproduction(world, world.getCurrentLocation());
     }
 
@@ -41,10 +41,12 @@ public class Rabbit extends Animal {
     protected void performNightTasks(World world) {
         Location currentLoc = world.getCurrentLocation();
         if (!world.isOnTile(this)) return;
-        if (world.getTile(currentLoc).getClass() == Borrow.class) {
+        if (world.containsNonBlocking(currentLoc) && world.getTile(currentLoc) instanceof Borrow) {
             this.performSleep(world, currentLoc);
             return;
-        } else if (this.borrow == null) {
+        }
+
+        if (this.borrow == null && !world.containsNonBlocking(currentLoc)) {
             this.attemptBorrowDigging(world);
             return;
         }
@@ -54,6 +56,19 @@ public class Rabbit extends Animal {
         // calculate the next tile in the straightest path to the borrow
         // move to that tile
         //
+    }
+
+    private void attemptEating(World world) {
+        if (this.energy == this.maxEnergy()) return;
+
+        Location currentLoc = world.getCurrentLocation();
+        Object nonBlockingObj = world.getNonBlocking(currentLoc);
+        if (nonBlockingObj == null) return;
+        if (nonBlockingObj instanceof Consumable) {
+            // TODO: change out for consume method on interface
+            this.increaseEnergy(((Consumable) nonBlockingObj).getEnergyValue());
+            world.delete(nonBlockingObj);
+        }
 
     }
 
@@ -62,11 +77,13 @@ public class Rabbit extends Animal {
         Location currentLoc = world.getCurrentLocation();
         Random random = new Random();
         boolean success = random.nextInt(1, 10) == 5;
-        if (success) {
-            this.borrow = new Borrow();
-            world.setTile(currentLoc, this.borrow);
-            this.performSleep(world, currentLoc);
-        }
+        if (!success) return;
+
+        Borrow borrow = new Borrow();
+        world.setTile(currentLoc, borrow);
+
+        this.borrow = borrow;
+        this.performSleep(world, currentLoc);
     }
 
     private void attemptReproduction(World world, Location location) {
@@ -131,14 +148,14 @@ public class Rabbit extends Animal {
     }
 
     private void performSleep(World world, Location sleepingSpot) {
-        this.isSleeping = true;
         this.sleepingSpot = sleepingSpot;
         world.remove(this);
     }
 
     private void performWakeUp(World world, Location location) {
-        world.setTile(location, this);
         world.setCurrentLocation(location);
-        //this.increaseEnergy(5);
+        world.setTile(location, this);
+        this.increaseEnergy(5);
+        this.sleepingSpot = null;
     }
 }

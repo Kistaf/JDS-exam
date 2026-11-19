@@ -24,8 +24,8 @@ public abstract class Animal implements Actor {
 
     @Override
     public void act(World world) {
-        if (world.isNight()) this.performNightTasks(world);
-        else if (world.isDay()) this.performDayTasks(world);
+        if (world.isDay()) this.performDayTasks(world);
+        else this.performNightTasks(world);
 
         age += 0.1;
         this.energy -= 0.1;
@@ -48,7 +48,7 @@ public abstract class Animal implements Actor {
     }
 
     protected void increaseEnergy(double increaseBy) {
-        this.energy -= Math.max(this.maxEnergy(), this.energy + increaseBy);
+        this.energy += Math.max(this.maxEnergy(), this.energy + increaseBy);
     }
 
     protected double maxEnergy() {

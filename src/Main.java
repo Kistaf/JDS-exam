@@ -1,6 +1,5 @@
 import java.awt.*;
 import java.io.FileNotFoundException;
-import java.util.Random;
 
 import itumulator.executable.DisplayInformation;
 import itumulator.executable.Program;
@@ -9,6 +8,7 @@ import itumulator.world.World;
 import models.animals.Rabbit;
 import models.plants.Grass;
 import models.structures.Burrow;
+import models.utils.ThemeReaderModel;
 import utils.LocationUtils;
 import utils.ThemeReader;
 
@@ -16,9 +16,9 @@ public class Main {
 
     public static void main(String[] args) {
         try {
-            ThemeReader reader = new ThemeReader("resources/tema/tema1/week-1/t1-1c.txt");
+            ThemeReader reader = new ThemeReader("resources/tema/tema1/week-1/t1-2cde.txt");
 
-            Program p = new Program(reader.getWorldSize(), 800, 400);
+            Program p = new Program(reader.getWorldSize(), 800, 1000);
             World w = p.getWorld();
 
             DisplayInformation d1 = new DisplayInformation(Color.green, "grass");
@@ -28,20 +28,43 @@ public class Main {
             p.setDisplayInformation(Grass.class, d1);
             p.setDisplayInformation(Burrow.class, d3);
 
-            for (String model : reader.getModelAmounts().keySet()) {
-                for (int i = 0; i < reader.getModelAmounts().get(model); i++) {
-                    Location location = LocationUtils.randomFreeTile(w);
-                    if (location == null) continue;
+            for (ThemeReaderModel model : reader.getModels()) {
+                if (model.getName().equalsIgnoreCase("wolf")) {
+                    for (int i = 0; i < model.getCount(); i++) {
+                        // handle pack spawning
+                    }
+                } else {
+                    for (int i = 0; i < model.getCount(); i++) {
+                        Location randomLoc = LocationUtils.randomFreeTile(w);
+                        if (randomLoc == null) continue;
 
-                    if (model.equalsIgnoreCase("rabbit")) {
-                        Rabbit rabbit = new Rabbit(10);
-                        w.setTile(location, rabbit);
-                    } else if (model.equalsIgnoreCase("grass")) {
-                        Grass grass = new Grass(10,location);
-                        w.setTile(location, grass);
-                    }else if (model.equalsIgnoreCase("burrow")) {
-                        Burrow burrow = new Burrow(location);
-                        w.setTile(location, burrow);
+                        if (model.getName().equalsIgnoreCase("bear")) {
+                            Location predefinedLoc = model.getLoc();
+                            if (predefinedLoc == null) {
+                                // use randomLoc
+                            } else {
+                                // use predefinedLoc
+                            }
+                        }
+
+                        if (model.getName().equalsIgnoreCase("rabbit")) {
+                            Rabbit rabbit = new Rabbit();
+                            w.setTile(randomLoc, rabbit);
+                        }
+
+                        if (model.getName().equalsIgnoreCase("grass")) {
+                            Grass grass = new Grass(2);
+                            w.setTile(randomLoc, grass);
+                        }
+
+                        if (model.getName().equalsIgnoreCase("berry")) {
+                            // probably randomly decide if it should be a blue- or raspberry bush
+                        }
+
+                        if (model.getName().equalsIgnoreCase("burrow")) {
+                            Burrow burrow = new Burrow();
+                            w.setTile(randomLoc, burrow);
+                        }
                     }
                 }
             }

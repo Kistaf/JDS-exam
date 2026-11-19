@@ -79,7 +79,7 @@ public class Rabbit extends Animal {
         boolean success = random.nextInt(1, 10) == 5;
         if (!success) return;
 
-        Burrow burrow = new Burrow();
+        Burrow burrow = new Burrow(currentLoc);
         world.setTile(currentLoc, burrow);
 
         this.burrow = burrow;

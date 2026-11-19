@@ -3,75 +3,88 @@ package models.animals;
 import itumulator.simulator.Actor;
 import itumulator.world.Location;
 import itumulator.world.World;
+import utils.CollectionUtils;
 import utils.LocationUtils;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public abstract class Animal implements Actor {
     protected double age = 0;
     protected double energy;
 
-    private final double MAX_AGE = 30;
-    private final double BASE_ENERGY = 15;
-    private final double MIN_ENERGY = 0;
-
     protected Animal() {}
-
-    protected Animal(int startEnergy) {
-        this.energy = startEnergy;
-    }
 
     @Override
     public void act(World world) {
+        if (!world.contains(this)) return;
+
         if (world.isDay()) this.performDayTasks(world);
         else this.performNightTasks(world);
 
-        age += 0.1;
-        this.energy -= 0.1;
-        if (!world.contains(this)) return;
-        if (age >= this.maxAge() || energy <= 0) this.onDeath(world);
+        age += 0.25;
+        this.decreaseEnergy(0.35);
+        if (age >= this.maxAge() || energy <= 0) this.die(world);
     }
 
     protected abstract void performDayTasks(World world);
 
     protected abstract void performNightTasks(World world);
 
+    protected abstract void performEat(World world);
+
     protected void performRandomMove(World world) {
         Location newLocation = LocationUtils.randomSurroundingFreeTile(world);
+        if (newLocation == null) return;
         world.move(this, newLocation);
         world.setCurrentLocation(newLocation);
     }
 
+
+    public void performMoveTowardsTarget(World world, Location targetLoc) {
+        Location nextMove = LocationUtils.greedyBest(world, world.getCurrentLocation(), targetLoc);
+        if (nextMove == null || !world.isTileEmpty(nextMove)) return;
+        world.move(this, nextMove);
+        world.setCurrentLocation(nextMove);
+    }
+
+    protected Location computeRandomTargetLocation(World world, List<Object> targets) {
+        if (world.getEntities().isEmpty()) return null;
+        Set<Location> targetTiles = world.getEntities().keySet().stream()
+                .filter(entity -> targets.contains(entity.getClass()) && world.isOnTile(entity))
+                .map(world::getLocation)
+                .collect(Collectors.toSet());
+
+        return CollectionUtils.randomSetElement(targetTiles);
+    }
+
     protected void decreaseEnergy(double decreaseBy) {
-        this.energy -= Math.min(0, this.energy - decreaseBy);
+        this.energy = Math.max(0, this.energy - decreaseBy);
     }
 
     protected void increaseEnergy(double increaseBy) {
-        this.energy += Math.max(this.maxEnergy(), this.energy + increaseBy);
+        this.energy = Math.min(this.maxEnergy(), this.energy + increaseBy);
     }
 
-    protected double maxEnergy() {
-        return Math.min(this.MIN_ENERGY, this.BASE_ENERGY - this.age);
-    }
+    protected abstract double maxEnergy();
 
-    protected double maxAge() {
-        return this.MAX_AGE;
-    }
+    protected abstract double maxAge();
 
 
-    protected void onDeath(World world) {
+    protected void die(World world) {
         world.delete(this);
     }
 
     protected Set<Animal> sameSpeciesNearby(World world, Location location) {
-        Set<Animal> animals = new HashSet<>();
-        for (Animal animal : world.getAll(Animal.class, world.getSurroundingTiles())) {
-            if (animal.getClass() == this.getClass() && animal != this) {
-                animals.add(animal);
-            }
+        Set<Animal> same = new HashSet<>();
+        for (Animal animal : world.getAll(Animal.class, world.getSurroundingTiles(location))) {
+            if (animal != this && animal.getClass() == getClass()) same.add(animal);
         }
-        return animals;
+        return same;
     }
+
+
 
 }

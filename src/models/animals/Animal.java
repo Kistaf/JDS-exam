@@ -1,6 +1,5 @@
 package models.animals;
 
-import enums.Berry;
 import itumulator.executable.DisplayInformation;
 import itumulator.executable.DynamicDisplayInformationProvider;
 import itumulator.simulator.Actor;
@@ -19,10 +18,6 @@ public abstract class Animal implements Actor, DynamicDisplayInformationProvider
     protected double age = 0;
     protected double energy;
     protected String imageKey;
-
-    protected Animal(String imageKey) {
-        this.imageKey = imageKey;
-    }
 
     @Override
     public void act(World world) {
@@ -79,7 +74,6 @@ public abstract class Animal implements Actor, DynamicDisplayInformationProvider
 
     protected abstract double maxAge();
 
-    protected abstract double babyAge();
 
     protected abstract double adultAge();
 
@@ -98,9 +92,9 @@ public abstract class Animal implements Actor, DynamicDisplayInformationProvider
     @Override
     public DisplayInformation getInformation() {
         StringBuilder builder = new StringBuilder(this.imageKey);
-        if (this.age < this.babyAge()) builder.append("-small");
-        else if (age > this.adultAge()) builder.append("-large");
-        return new DisplayInformation(Color.GREEN, builder.toString());
+        if (this.age >= this.adultAge()) builder.append("-large");
+        else builder.append("-small");
+        return new DisplayInformation(Color.GREEN, builder.toString(), true);
     }
 
 }

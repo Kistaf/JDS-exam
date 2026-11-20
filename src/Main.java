@@ -25,9 +25,7 @@ public class Main {
             World w = p.getWorld();
 
             DisplayInformation d1 = new DisplayInformation(Color.green, "grass");
-            DisplayInformation d2 = new DisplayInformation(Color.red, "rabbit-small");
             DisplayInformation d3 = new DisplayInformation(Color.blue, "hole");
-            p.setDisplayInformation(Rabbit.class, d2);
             p.setDisplayInformation(Grass.class, d1);
             p.setDisplayInformation(Burrow.class, d3);
 
@@ -53,7 +51,7 @@ public class Main {
                         }
 
                         if (model.getName().equalsIgnoreCase("rabbit")) {
-                            Rabbit rabbit = new Rabbit("rabbit");
+                            Rabbit rabbit = new Rabbit();
                             w.setTile(randomLoc, rabbit);
                             continue;
                         }

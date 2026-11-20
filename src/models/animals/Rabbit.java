@@ -1,9 +1,6 @@
 package models.animals;
 
-import enums.Berry;
 import interfaces.Consumable;
-import itumulator.executable.DisplayInformation;
-import itumulator.executable.DynamicDisplayInformationProvider;
 import itumulator.world.Location;
 import itumulator.world.World;
 import models.plants.Grass;
@@ -23,12 +20,12 @@ public class Rabbit extends Animal {
     private Location sleepingSpot;
     private final double MIN_ENERGY = 10;
     private final double BASE_ENERGY = 20;
-    private final double MAX_AGE = 50;
+    private final double MAX_AGE = 30;
     private final double REPRODUCTION_ENERGY_MIN = 10;
 
-    public Rabbit(String imageKey) {
-        super(imageKey);
+    public Rabbit() {
         this.energy = BASE_ENERGY;
+        this.imageKey = "rabbit";
     }
 
     @Override
@@ -118,13 +115,8 @@ public class Rabbit extends Animal {
     }
 
     @Override
-    protected double babyAge() {
-        return this.maxEnergy() * 0.90;
-    }
-
-    @Override
     protected double adultAge() {
-        return this.maxEnergy() * 0.5;
+        return this.maxAge() * 0.20;
     }
 
 
@@ -204,7 +196,7 @@ public class Rabbit extends Animal {
         Rabbit mate = (Rabbit) CollectionUtils.randomSetElement(closeByRabbits);
         if (mate == null || mate == this || mate.energy < this.REPRODUCTION_ENERGY_MIN) return;
 
-        Rabbit baby = new Rabbit("rabbit");
+        Rabbit baby = new Rabbit();
         Location babyLoc = LocationUtils.randomCompletelyFreeTile(world);
         world.setTile(babyLoc, baby);
 

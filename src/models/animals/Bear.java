@@ -3,11 +3,6 @@ package models.animals;
 import itumulator.world.World;
 
 public class Bear extends Animal {
-
-    public Bear(String imageKey) {
-        super(imageKey);
-    }
-
     @Override
     protected void performDayTasks(World world) {
 
@@ -30,11 +25,6 @@ public class Bear extends Animal {
 
     @Override
     protected double maxAge() {
-        return 0;
-    }
-
-    @Override
-    protected double babyAge() {
         return 0;
     }
 

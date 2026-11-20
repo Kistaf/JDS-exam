@@ -1,6 +1,9 @@
 package models.animals;
 
+import enums.Berry;
 import interfaces.Consumable;
+import itumulator.executable.DisplayInformation;
+import itumulator.executable.DynamicDisplayInformationProvider;
 import itumulator.world.Location;
 import itumulator.world.World;
 import models.plants.Grass;
@@ -8,6 +11,7 @@ import models.structures.Burrow;
 import utils.CollectionUtils;
 import utils.LocationUtils;
 
+import java.awt.*;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
@@ -22,7 +26,8 @@ public class Rabbit extends Animal {
     private final double MAX_AGE = 50;
     private final double REPRODUCTION_ENERGY_MIN = 10;
 
-    public Rabbit() {
+    public Rabbit(String imageKey) {
+        super(imageKey);
         this.energy = BASE_ENERGY;
     }
 
@@ -95,7 +100,7 @@ public class Rabbit extends Animal {
         Object nonBlockingObj = world.getNonBlocking(currentLoc);
         if (nonBlockingObj == null) return;
         if (nonBlockingObj instanceof Consumable food) {
-            int energyGain = food.getEnergyValue();
+            double energyGain = food.getEnergyValue();
             if (!food.consumableBy().contains(Rabbit.class)) return;
             food.consume(world);
             this.increaseEnergy(energyGain);
@@ -110,6 +115,16 @@ public class Rabbit extends Animal {
     @Override
     protected double maxAge() {
         return this.MAX_AGE;
+    }
+
+    @Override
+    protected double babyAge() {
+        return this.maxEnergy() * 0.90;
+    }
+
+    @Override
+    protected double adultAge() {
+        return this.maxEnergy() * 0.5;
     }
 
 
@@ -175,7 +190,7 @@ public class Rabbit extends Animal {
         }
 
         // last resort; spawn at a random free tile
-        Location lastResortLocation = LocationUtils.randomFreeTile(world);
+        Location lastResortLocation = LocationUtils.randomCompletelyFreeTile(world);
         // map is full; rabbit must wait till next daily cycle
         if (lastResortLocation == null) return;
         this.performWakeUp(world, lastResortLocation);
@@ -189,8 +204,8 @@ public class Rabbit extends Animal {
         Rabbit mate = (Rabbit) CollectionUtils.randomSetElement(closeByRabbits);
         if (mate == null || mate == this || mate.energy < this.REPRODUCTION_ENERGY_MIN) return;
 
-        Rabbit baby = new Rabbit();
-        Location babyLoc = LocationUtils.randomFreeTile(world);
+        Rabbit baby = new Rabbit("rabbit");
+        Location babyLoc = LocationUtils.randomCompletelyFreeTile(world);
         world.setTile(babyLoc, baby);
 
         this.decreaseEnergy(5);
@@ -209,4 +224,5 @@ public class Rabbit extends Animal {
         this.increaseEnergy(5);
         this.setSleepingSpot(null);
     }
+
 }

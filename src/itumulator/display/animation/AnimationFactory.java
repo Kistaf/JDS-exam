@@ -130,7 +130,7 @@ public class AnimationFactory {
         // sort so that nonBlocking appear lowest (using built in comparator of animations)
         Collections.sort(animations);
 
-        // zip the individual animationFrames of each animation to make everything move at once
+        // zip the individual animationFrames of each animation to make everything performMove at once
         List<Callable<BufferedImage>> sets = new ArrayList<>();
         for (int i = 0; i < length; i++) {
             AnimationSet set = new AnimationSet();

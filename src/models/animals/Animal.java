@@ -3,6 +3,7 @@ package models.animals;
 import itumulator.simulator.Actor;
 import itumulator.world.Location;
 import itumulator.world.World;
+import models.structures.Carcass;
 import utils.CollectionUtils;
 import utils.LocationUtils;
 
@@ -74,12 +75,32 @@ public abstract class Animal implements Actor {
 
 
     protected void die(World world) {
+        Location location = null;
+        if ((world.isOnTile(this))){
+            world.setCurrentLocation(world.getLocation(this));
+            location = world.getCurrentLocation();
+        }
         world.delete(this);
+        spawnCarcass(world, location);
+    }
+
+    protected void spawnCarcass(World world, Location location){
+        if(location == null) return;
+        Carcass carcass = new Carcass(50);
+        world.setTile(location, carcass);
     }
 
     protected Set<Animal> sameSpeciesNearby(World world, Location location) {
         Set<Animal> same = new HashSet<>();
         for (Animal animal : world.getAll(Animal.class, world.getSurroundingTiles(location))) {
+            if (animal != this && animal.getClass() == getClass()) same.add(animal);
+        }
+        return same;
+    }
+
+    protected Set<Animal> sameSpeciesNearby(World world, Location location, int radius) {
+        Set<Animal> same = new HashSet<>();
+        for (Animal animal : world.getAll(Animal.class, world.getSurroundingTiles(location, radius))) {
             if (animal != this && animal.getClass() == getClass()) same.add(animal);
         }
         return same;

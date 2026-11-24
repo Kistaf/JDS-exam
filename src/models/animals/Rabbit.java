@@ -1,29 +1,33 @@
 package models.animals;
 
 import interfaces.Consumable;
+import itumulator.executable.DisplayInformation;
+import itumulator.executable.DynamicDisplayInformationProvider;
 import itumulator.world.Location;
 import itumulator.world.World;
 import models.plants.Grass;
-import models.structures.Burrow;
+import models.structures.RabbitHole;
 import utils.CollectionUtils;
 import utils.LocationUtils;
 
+import java.awt.*;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class Rabbit extends Animal {
-    private Burrow burrow;
+public class Rabbit extends Animal implements DynamicDisplayInformationProvider {
+    private RabbitHole rabbitHole;
     private Location sleepingSpot;
     private final double MIN_ENERGY = 10;
     private final double BASE_ENERGY = 20;
-    private final double MAX_AGE = 50;
+    private final double MAX_AGE = 30;
     private final double REPRODUCTION_ENERGY_MIN = 10;
 
     public Rabbit() {
         this.energy = BASE_ENERGY;
+        this.imageKey = "rabbit";
     }
 
     @Override
@@ -65,7 +69,7 @@ public class Rabbit extends Animal {
         Location currentLoc = world.getCurrentLocation();
 
         // borrow another rabbits burrow for the night
-        if (world.containsNonBlocking(currentLoc) && world.getNonBlocking(currentLoc) instanceof Burrow) {
+        if (world.containsNonBlocking(currentLoc) && world.getNonBlocking(currentLoc) instanceof RabbitHole) {
             this.performSleep(world, currentLoc);
             return;
         }
@@ -73,7 +77,7 @@ public class Rabbit extends Animal {
         // walk towards own burrow
         Random random = new Random();
         boolean success = random.nextInt(0, 2) == 1;
-        if (this.burrow != null && success) {
+        if (this.rabbitHole != null && success) {
             Location burrowLocation = this.locateBurrow(world);
             Location bestNextTile = LocationUtils.greedyBest(world, currentLoc, burrowLocation);
             if (bestNextTile == null || !world.isTileEmpty(bestNextTile)) return;
@@ -83,7 +87,7 @@ public class Rabbit extends Animal {
             this.performRandomMove(world);
         }
 
-        if (this.burrow == null) this.attemptBurrowDigging(world);
+        if (this.rabbitHole == null) this.attemptHoleDigging(world);
 
     }
 
@@ -95,7 +99,7 @@ public class Rabbit extends Animal {
         Object nonBlockingObj = world.getNonBlocking(currentLoc);
         if (nonBlockingObj == null) return;
         if (nonBlockingObj instanceof Consumable food) {
-            int energyGain = food.getEnergyValue();
+            double energyGain = food.getEnergyValue();
             if (!food.consumableBy().contains(Rabbit.class)) return;
             food.consume(world);
             this.increaseEnergy(energyGain);
@@ -112,26 +116,31 @@ public class Rabbit extends Animal {
         return this.MAX_AGE;
     }
 
+    @Override
+    protected double adultAge() {
+        return this.maxAge() * 0.20;
+    }
 
-    private void attemptBurrowDigging(World world) {
+
+    private void attemptHoleDigging(World world) {
         Location currentLoc = world.getCurrentLocation();
         if (world.containsNonBlocking(currentLoc)) return;
         Random random = new Random();
         boolean success = random.nextInt(1, 12) == 5;
         if (!success) return;
-        this.performBurrowDigging(world, currentLoc);
+        this.performHoleDigging(world, currentLoc);
     }
 
-    public void performBurrowDigging(World world, Location currentLoc) {
-        Burrow burrow = new Burrow();
-        world.setTile(currentLoc, burrow);
-        this.burrow = burrow;
+    public void performHoleDigging(World world, Location currentLoc) {
+        RabbitHole rabbitHole = new RabbitHole();
+        world.setTile(currentLoc, rabbitHole);
+        this.rabbitHole = rabbitHole;
         this.performSleep(world, currentLoc);
     }
 
     public Location locateBurrow(World world) {
-        if (this.burrow == null) return null;
-        return world.getLocation(this.burrow);
+        if (this.rabbitHole == null) return null;
+        return world.getLocation(this.rabbitHole);
     }
 
     public void setSleepingSpot(Location location) {
@@ -153,17 +162,17 @@ public class Rabbit extends Animal {
             return;
         }
 
-        Set<Location> mapBurrows = world.getEntities().keySet().stream()
-                .filter(entity -> entity.getClass() == Burrow.class)
+        Set<Location> mapRabbitHoles = world.getEntities().keySet().stream()
+                .filter(entity -> entity.getClass() == RabbitHole.class)
                 .map(world::getLocation)
                 .collect(Collectors.toSet());
 
-        if (!mapBurrows.isEmpty()) {
+        if (!mapRabbitHoles.isEmpty()) {
             // spawn at any other burrow on the spawn
             Set<Location> triedLocs = new HashSet<>();
-            while (triedLocs.size() != mapBurrows.size()) {
-                mapBurrows.removeIf(triedLocs::contains);
-                Location randomLoc = CollectionUtils.randomSetElement(mapBurrows);
+            while (triedLocs.size() != mapRabbitHoles.size()) {
+                mapRabbitHoles.removeIf(triedLocs::contains);
+                Location randomLoc = CollectionUtils.randomSetElement(mapRabbitHoles);
                 if (randomLoc == null) continue;
                 triedLocs.add(randomLoc);
 
@@ -175,7 +184,7 @@ public class Rabbit extends Animal {
         }
 
         // last resort; spawn at a random free tile
-        Location lastResortLocation = LocationUtils.randomFreeTile(world);
+        Location lastResortLocation = LocationUtils.randomCompletelyFreeTile(world);
         // map is full; rabbit must wait till next daily cycle
         if (lastResortLocation == null) return;
         this.performWakeUp(world, lastResortLocation);
@@ -190,7 +199,7 @@ public class Rabbit extends Animal {
         if (mate == null || mate == this || mate.energy < this.REPRODUCTION_ENERGY_MIN) return;
 
         Rabbit baby = new Rabbit();
-        Location babyLoc = LocationUtils.randomFreeTile(world);
+        Location babyLoc = LocationUtils.randomCompletelyFreeTile(world);
         world.setTile(babyLoc, baby);
 
         this.decreaseEnergy(5);
@@ -209,4 +218,13 @@ public class Rabbit extends Animal {
         this.increaseEnergy(5);
         this.setSleepingSpot(null);
     }
+
+    @Override
+    public DisplayInformation getInformation() {
+        StringBuilder builder = new StringBuilder(this.imageKey);
+        if (this.age >= this.adultAge()) builder.append("-large");
+        else builder.append("-small");
+        return new DisplayInformation(Color.GREEN, builder.toString(), true);
+    }
+
 }

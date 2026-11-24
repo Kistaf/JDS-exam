@@ -1,2 +1,10 @@
-5
-wolf 1
+20
+wolf 5-15
+wolf 5-15
+rabbit 10-20
+grass 10-20
+
+
+
+
+

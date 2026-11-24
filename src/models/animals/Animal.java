@@ -1,11 +1,15 @@
 package models.animals;
 
+import itumulator.executable.DisplayInformation;
+import itumulator.executable.DynamicDisplayInformationProvider;
 import itumulator.simulator.Actor;
 import itumulator.world.Location;
 import itumulator.world.World;
+import models.structures.Carcass;
 import utils.CollectionUtils;
 import utils.LocationUtils;
 
+import java.awt.*;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -14,8 +18,7 @@ import java.util.stream.Collectors;
 public abstract class Animal implements Actor {
     protected double age = 0;
     protected double energy;
-
-    protected Animal() {}
+    protected String imageKey;
 
     @Override
     public void act(World world) {
@@ -73,8 +76,22 @@ public abstract class Animal implements Actor {
     protected abstract double maxAge();
 
 
+    protected abstract double adultAge();
+
     protected void die(World world) {
+        Location location = null;
+        if ((world.isOnTile(this))){
+            world.setCurrentLocation(world.getLocation(this));
+            location = world.getCurrentLocation();
+        }
         world.delete(this);
+        spawnCarcass(world, location);
+    }
+
+    protected void spawnCarcass(World world, Location location){
+        if(location == null) return;
+        Carcass carcass = new Carcass(50);
+        world.setTile(location, carcass);
     }
 
     protected Set<Animal> sameSpeciesNearby(World world, Location location) {
@@ -84,6 +101,15 @@ public abstract class Animal implements Actor {
         }
         return same;
     }
+
+    protected Set<Animal> sameSpeciesNearby(World world, Location location, int radius) {
+        Set<Animal> same = new HashSet<>();
+        for (Animal animal : world.getAll(Animal.class, world.getSurroundingTiles(location, radius))) {
+            if (animal != this && animal.getClass() == getClass()) same.add(animal);
+        }
+        return same;
+    }
+
 
 
 

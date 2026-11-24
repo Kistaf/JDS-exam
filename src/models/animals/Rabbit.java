@@ -9,16 +9,17 @@ import models.plants.Grass;
 import models.structures.RabbitHole;
 import utils.CollectionUtils;
 import utils.LocationUtils;
+import utils.NumberUtils;
 
 import java.awt.*;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class Rabbit extends Animal implements DynamicDisplayInformationProvider {
-    private RabbitHole rabbitHole;
+    private RabbitHole boundRabbitHole;
+    private Object nightMovementTarget;
+    private Object dayMovementTarget;
     private Location sleepingSpot;
     private final double MIN_ENERGY = 10;
     private final double BASE_ENERGY = 20;
@@ -31,18 +32,10 @@ public class Rabbit extends Animal implements DynamicDisplayInformationProvider 
     }
 
     @Override
-    public void act(World world) {
-        if (!world.contains(this)) return;
-        if (!world.isOnTile(this) && this.sleepingSpot != null) {
-            if (world.isDay()) this.attemptWakeUp(world);
-            return;
-        }
-        super.act(world);
-    }
-
-    @Override
     protected void performDayTasks(World world) {
-        Location currentLoc = world.getCurrentLocation();
+        if (!world.isOnTile(this)) return;
+        this.nightMovementTarget = null;
+        Location currentLoc = currentLocation(world);
 
         Random random = new Random();
         int roll = random.nextInt(0, 10);
@@ -66,30 +59,74 @@ public class Rabbit extends Animal implements DynamicDisplayInformationProvider 
     @Override
     protected void performNightTasks(World world) {
         if (!world.isOnTile(this)) return;
-        Location currentLoc = world.getCurrentLocation();
+        this.dayMovementTarget = null;
+        Location currentLoc = currentLocation(world);
 
-        // borrow another rabbits burrow for the night
-        if (world.containsNonBlocking(currentLoc) && world.getNonBlocking(currentLoc) instanceof RabbitHole) {
-            this.performSleep(world, currentLoc);
+        if (isStandingOnRabbitHole(world)) {
+            RabbitHole hole = (RabbitHole) world.getNonBlocking(currentLoc);
+            this.enterRabbitHole(world, hole);
             return;
         }
 
-        // walk towards own burrow
-        Random random = new Random();
-        boolean success = random.nextInt(0, 2) == 1;
-        if (this.rabbitHole != null && success) {
-            Location burrowLocation = this.locateBurrow(world);
-            Location bestNextTile = LocationUtils.greedyBest(world, currentLoc, burrowLocation);
-            if (bestNextTile == null || !world.isTileEmpty(bestNextTile)) return;
-            world.move(this, bestNextTile);
-            world.setCurrentLocation(bestNextTile);
-        } else {
-            this.performRandomMove(world);
+        boolean shouldDigRabbitHole = NumberUtils.chancePercentage(10);
+        if (this.boundRabbitHole == null && shouldDigRabbitHole) {
+            this.attemptRabbitHoleDigging(world);
+            if (this.boundRabbitHole != null) return;
         }
 
-        if (this.rabbitHole == null) this.attemptHoleDigging(world);
+
+        // determine target for the night
+        if (this.nightMovementTarget == null) {
+            if (this.boundRabbitHole != null) {
+                this.nightMovementTarget = this.boundRabbitHole;
+            } else {
+                Set<RabbitHole> holes = CollectionUtils.allEntitiesOfType(world, RabbitHole.class);
+                if (!holes.isEmpty()) {
+                    this.nightMovementTarget = CollectionUtils.randomSetElement(holes);
+                }
+            }
+        }
+
+        // no rabbit holes on the map
+        if (this.nightMovementTarget == null) {
+            this.performRandomMove(world);
+        } else {
+            Location targetLoc = world.getLocation(this.nightMovementTarget);
+            Location nextLoc = this.computeNextBestTile(world, currentLoc, targetLoc);
+            if (nextLoc == null) return;
+            world.move(this, nextLoc);
+            world.setCurrentLocation(nextLoc);
+        }
 
     }
+
+    private Location currentLocation(World world) {
+        return world.getLocation(this);
+    }
+
+    private Location computeNextBestTile(World world, Location from, Location to) {
+        Location bestNextTile = LocationUtils.greedyBest(world, from, to);
+        if (bestNextTile == null || !world.isTileEmpty(bestNextTile)) return null;
+        return bestNextTile;
+    }
+
+
+    private boolean isStandingOnRabbitHole(World world) {
+        Location currentLoc = world.getLocation(this);
+        return world.getNonBlocking(currentLoc) instanceof RabbitHole;
+    }
+
+
+    public void enterRabbitHole(World world, RabbitHole hole) {
+        hole.enter(this);
+        world.remove(this);
+    }
+
+    public void exitRabbitHole(World world, Location loc) {
+        world.setTile(loc, this);
+        world.setCurrentLocation(loc);
+    }
+
 
     @Override
     public void performEat(World world) {
@@ -122,72 +159,19 @@ public class Rabbit extends Animal implements DynamicDisplayInformationProvider 
     }
 
 
-    private void attemptHoleDigging(World world) {
-        Location currentLoc = world.getCurrentLocation();
+    private void attemptRabbitHoleDigging(World world) {
+        Location currentLoc = world.getLocation(this);
         if (world.containsNonBlocking(currentLoc)) return;
-        Random random = new Random();
-        boolean success = random.nextInt(1, 12) == 5;
-        if (!success) return;
-        this.performHoleDigging(world, currentLoc);
+        boolean shouldDig = NumberUtils.chancePercentage(40);
+        if (!shouldDig) return;
+        this.performRabbitHoleDigging(world, currentLoc);
     }
 
-    public void performHoleDigging(World world, Location currentLoc) {
+    public void performRabbitHoleDigging(World world, Location currentLoc) {
         RabbitHole rabbitHole = new RabbitHole();
         world.setTile(currentLoc, rabbitHole);
-        this.rabbitHole = rabbitHole;
-        this.performSleep(world, currentLoc);
-    }
-
-    public Location locateBurrow(World world) {
-        if (this.rabbitHole == null) return null;
-        return world.getLocation(this.rabbitHole);
-    }
-
-    public void setSleepingSpot(Location location) {
-        this.sleepingSpot = location;
-    }
-
-
-    private void attemptWakeUp(World world) {
-        Location sleepingSpot = this.sleepingSpot;
-        // priority:
-        // 1: burrow where they went to sleep
-        // 2: Any other burrow on the map (tunnel)
-        // 3: Random tile as last resort.
-        // 4: Wait for next daily cycle.
-
-        // handle if burrow spot exists & currently has no blocking entity on it
-        if (world.isTileEmpty(sleepingSpot)) {
-            this.performWakeUp(world, sleepingSpot);
-            return;
-        }
-
-        Set<Location> mapRabbitHoles = world.getEntities().keySet().stream()
-                .filter(entity -> entity.getClass() == RabbitHole.class)
-                .map(world::getLocation)
-                .collect(Collectors.toSet());
-
-        if (!mapRabbitHoles.isEmpty()) {
-            // spawn at any other burrow on the spawn
-            Set<Location> triedLocs = new HashSet<>();
-            while (triedLocs.size() != mapRabbitHoles.size()) {
-                mapRabbitHoles.removeIf(triedLocs::contains);
-                Location randomLoc = CollectionUtils.randomSetElement(mapRabbitHoles);
-                if (randomLoc == null) continue;
-                triedLocs.add(randomLoc);
-
-                if (world.isTileEmpty(randomLoc)) {
-                    this.performWakeUp(world, randomLoc);
-                    return;
-                }
-            }
-        }
-
-        // last resort; spawn at a random free tile
-        Location lastResortLocation = LocationUtils.randomCompletelyFreeTile(world);
-        // map is full; rabbit must wait till next daily cycle
-        if (lastResortLocation == null) return;
-        this.performWakeUp(world, lastResortLocation);
+        this.boundRabbitHole = rabbitHole;
+        this.enterRabbitHole(world, rabbitHole);
     }
 
     public void attemptReproduction(World world, Location location) {
@@ -206,18 +190,6 @@ public class Rabbit extends Animal implements DynamicDisplayInformationProvider 
         mate.decreaseEnergy(5);
     }
 
-
-    public void performSleep(World world, Location sleepingSpot) {
-        this.setSleepingSpot(sleepingSpot);
-        world.remove(this);
-    }
-
-    public void performWakeUp(World world, Location location) {
-        world.setCurrentLocation(location);
-        world.setTile(location, this);
-        this.increaseEnergy(5);
-        this.setSleepingSpot(null);
-    }
 
     @Override
     public DisplayInformation getInformation() {

@@ -1,38 +1,44 @@
 package models.structures;
 
+import itumulator.simulator.Actor;
+import itumulator.world.Location;
+import itumulator.world.World;
 import models.animals.Rabbit;
 import itumulator.world.NonBlocking;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class RabbitHole implements NonBlocking {
-    private List<Rabbit> boundRabbits;
-    private Tunnel tunnel;
+public class RabbitHole implements Actor, NonBlocking {
+    private List<Rabbit> rabbits;
 
     public RabbitHole() {
-        boundRabbits = new ArrayList<>();
-        tunnel = null;
+        this.rabbits = new ArrayList<>();
     }
 
-    public List<Rabbit> getRabbits() { return boundRabbits; }
-
-    public void addRabbit(Rabbit rabbit) {
-        if(boundRabbits.contains(rabbit)) throw new IllegalArgumentException("*** Already contains rabbit ***");
-        boundRabbits.add(rabbit);
+    @Override
+    public void act(World world) {
+        if (world.isDay()) {
+            this.wakeUpRabbits(world);
+        }
     }
 
-    public void removeRabbit(Rabbit rabbit) {
-        if(!boundRabbits.contains(rabbit)) throw new IllegalArgumentException("*** Does not contain rabbit ***");
-        boundRabbits.remove(rabbit);
+
+    public void enter(Rabbit rabbit) {
+        this.rabbits.add(rabbit);
     }
 
-    public Tunnel getTunnel() {
-        return tunnel;
+    public void exit(Rabbit rabbit) {
+        this.rabbits.remove(rabbit);
     }
 
-    public void setTunnel(Tunnel tunnel) {
-        this.tunnel = tunnel;
+    private void wakeUpRabbits(World world) {
+        Location currentLoc = world.getLocation(this);
+        for (Rabbit rabbit : new ArrayList<>(this.rabbits)) {
+            if (world.isTileEmpty(currentLoc)) {
+                rabbit.exitRabbitHole(world, currentLoc);
+                this.exit(rabbit);
+            }
+        }
     }
-
 }

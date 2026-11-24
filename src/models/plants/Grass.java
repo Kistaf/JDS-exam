@@ -6,13 +6,10 @@ import itumulator.world.Location;
 import itumulator.world.NonBlocking;
 import itumulator.world.World;
 import models.animals.Rabbit;
-import models.plants.berries.BerryBush;
 import utils.LocationUtils;
 import utils.NumberUtils;
 
 import java.util.List;
-import java.util.Random;
-import java.util.random.RandomGenerator;
 
 public class Grass implements Actor, Consumable, NonBlocking {
     private double energy;
@@ -37,7 +34,7 @@ public class Grass implements Actor, Consumable, NonBlocking {
         int worldSize = world.getSize();
         double grassTakingUpPercentage = (currentGrassAmount / (worldSize * worldSize));
         if (grassTakingUpPercentage >= 0.25) return;
-        boolean success = NumberUtils.chance(5);
+        boolean success = NumberUtils.chancePercentage(5);
         if (success) spread(world);
     }
 

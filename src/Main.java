@@ -77,7 +77,7 @@ public class Main {
                             w.setTile(randomLoc, grass);
                         }
                         else if (model.getName().equalsIgnoreCase("berry")) {
-                            boolean ordinaryBush = NumberUtils.chance(60);
+                            boolean ordinaryBush = NumberUtils.chancePercentage(60);
                             if (ordinaryBush) {
                                 BlueberryBush blueberryBush = new BlueberryBush(5);
                                 w.setTile(randomLoc, blueberryBush);

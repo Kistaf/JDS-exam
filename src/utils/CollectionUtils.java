@@ -1,9 +1,9 @@
 package utils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import itumulator.world.World;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class CollectionUtils {
     public static <T> T randomSetElement(Set<T> set) {
@@ -19,6 +19,13 @@ public class CollectionUtils {
 
         Random random = new Random();
         return list.get(random.nextInt(list.size()));
+    }
+
+    public static <T> Set<T> allEntitiesOfType(World world, Class<T> type) {
+        return world.getEntities().keySet().stream()
+                .filter(type::isInstance)
+                .map(type::cast)
+                .collect(Collectors.toSet());
     }
 
 }

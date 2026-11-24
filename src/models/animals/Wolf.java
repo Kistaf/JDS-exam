@@ -1,14 +1,18 @@
 package models.animals;
 
+import itumulator.executable.DisplayInformation;
+import itumulator.executable.DynamicDisplayInformationProvider;
 import itumulator.world.Location;
 import itumulator.world.World;
 import models.structures.Carcass;
 import models.structures.WolfDen;
 import utils.CollectionUtils;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
-public class Wolf extends Animal {
+public class Wolf extends Animal implements DynamicDisplayInformationProvider {
     private WolfPack boundPack;
     private final int atkDmg = 10;
     private final double MAX_ENERGY = 100;
@@ -21,6 +25,7 @@ public class Wolf extends Animal {
         boundPack = null;
         energy = MAX_ENERGY * 0.85;
         age = 0;
+        this.imageKey = "wolf";
     }
 
     public Wolf(WolfPack wolfPack){
@@ -28,6 +33,7 @@ public class Wolf extends Animal {
         boundPack.addWolf(this);
         energy = MAX_ENERGY * 0.85;
         age = 0;
+        this.imageKey = "wolf";
     }
 
     @Override
@@ -370,6 +376,13 @@ public class Wolf extends Animal {
 
     @Override
     protected double adultAge() {
-        return 0;
+        return this.maxAge() * 0.2;
+    }
+
+    @Override
+    public DisplayInformation getInformation() {
+        StringBuilder builder = new StringBuilder(this.imageKey);
+        if (this.age < this.adultAge()) builder.append("-small");
+        return new DisplayInformation(Color.GREEN, builder.toString(), true);
     }
 }

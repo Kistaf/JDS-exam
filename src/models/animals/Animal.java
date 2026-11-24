@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public abstract class Animal implements Actor, DynamicDisplayInformationProvider {
+public abstract class Animal implements Actor {
     protected double age = 0;
     protected double energy;
     protected String imageKey;
@@ -111,12 +111,6 @@ public abstract class Animal implements Actor, DynamicDisplayInformationProvider
     }
 
 
-    @Override
-    public DisplayInformation getInformation() {
-        StringBuilder builder = new StringBuilder(this.imageKey);
-        if (this.age >= this.adultAge()) builder.append("-large");
-        else builder.append("-small");
-        return new DisplayInformation(Color.GREEN, builder.toString(), true);
-    }
+
 
 }

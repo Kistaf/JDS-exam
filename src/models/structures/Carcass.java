@@ -34,7 +34,7 @@ public class Carcass implements Actor, Consumable {
     }
 
     @Override
-    public int getEnergyValue() {
+    public double getEnergyValue() {
         int temp = energy;
         decreaseEnergy(consumeEnergy);
         return Math.min(temp, consumeEnergy);

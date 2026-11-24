@@ -18,6 +18,12 @@ public class LocationUtils {
         return CollectionUtils.randomSetElement(emptySurroundings);
     }
 
+    public static Location randomSurroundingFreeTile(World world, Location location) {
+        world.setCurrentLocation(location);
+        Set<Location> emptySurroundings = world.getEmptySurroundingTiles(world.getCurrentLocation());
+        return CollectionUtils.randomSetElement(emptySurroundings);
+    }
+
     public static Set<Location> completeFreeSurroundingTiles(World world) {
         Location currentLoc = world.getCurrentLocation();
         Set<Location> surroundingTiles = world.getSurroundingTiles(currentLoc);

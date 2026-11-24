@@ -20,7 +20,6 @@ public class WolfPack {
 
     public void checkPrayStatus(World world){
         if (prey != null && !world.getEntities().containsKey(prey)){
-            System.out.println("Prey is dead");
             setPrey(null);
         }
     }

@@ -11,7 +11,7 @@ import models.animals.WolfPack;
 import models.plants.Grass;
 import models.plants.berries.BlueberryBush;
 import models.plants.berries.RaspberryBush;
-import models.structures.Burrow;
+import models.structures.RabbitHole;
 import models.structures.Carcass;
 import models.structures.WolfDen;
 import models.utils.ThemeReaderModel;
@@ -23,20 +23,20 @@ public class Main {
 
     public static void main(String[] args) {
         try {
-            ThemeReader reader = new ThemeReader("resources/tema/tema1/week-1/t1-1c.txt");
+            ThemeReader reader = new ThemeReader("resources/tema/tema2/week-2/t2-1ab.txt");
 
-            Program p = new Program(reader.getWorldSize(), 800, 100);
+            Program p = new Program(reader.getWorldSize(), 800, 1200);
             World w = p.getWorld();
 
             DisplayInformation d1 = new DisplayInformation(Color.green, "grass");
             DisplayInformation d2 = new DisplayInformation(Color.red, "rabbit-small");
             DisplayInformation d3 = new DisplayInformation(Color.blue, "hole-small");
-            DisplayInformation d4 = new DisplayInformation(Color.gray, "wolf");
+            DisplayInformation d4 = new DisplayInformation(Color.gray, "wolf-small");
             DisplayInformation d5 = new DisplayInformation(Color.DARK_GRAY, "hole");
             DisplayInformation d6 = new DisplayInformation(Color.orange, "carcass");
             p.setDisplayInformation(Rabbit.class, d2);
             p.setDisplayInformation(Grass.class, d1);
-            p.setDisplayInformation(Burrow.class, d3);
+            p.setDisplayInformation(RabbitHole.class, d3);
             p.setDisplayInformation(Wolf.class, d4);
             p.setDisplayInformation(WolfDen.class, d5);
             p.setDisplayInformation(Carcass.class, d6);
@@ -44,7 +44,7 @@ public class Main {
 
             for (ThemeReaderModel model : reader.getModels()) {
                 if (model.getName().equalsIgnoreCase("wolf")) {
-                    Location startLoc = LocationUtils.slowRandomFreeTile(w);
+                    Location startLoc = LocationUtils.randomCompletelyFreeTile(w);
                     WolfPack wolfPack = new WolfPack();
                     for (int i = 0; i < model.getCount(); i++) {
                         Location randomLoc = LocationUtils.randomSurroundingFreeTile(w, startLoc);
@@ -67,19 +67,14 @@ public class Main {
                             } else {
                                 // use predefinedLoc
                             }
-                            continue;
                         }
                         else if (model.getName().equalsIgnoreCase("rabbit")) {
-                            System.out.println("Rabbit");
                             Rabbit rabbit = new Rabbit();
                             w.setTile(randomLoc, rabbit);
-                            continue;
                         }
                         else if (model.getName().equalsIgnoreCase("grass")) {
-                            System.out.println("Grass");
                             Grass grass = new Grass(2);
                             w.setTile(randomLoc, grass);
-                            continue;
                         }
                         else if (model.getName().equalsIgnoreCase("berry")) {
                             boolean ordinaryBush = NumberUtils.chance(60);
@@ -90,11 +85,10 @@ public class Main {
                                 RaspberryBush raspberryBush = new RaspberryBush(6);
                                 w.setTile(randomLoc, raspberryBush);
                             }
-                            continue;
                         }
                         else if (model.getName().equalsIgnoreCase("burrow")) {
-                            Burrow burrow = new Burrow();
-                            w.setTile(randomLoc, burrow);
+                            RabbitHole rabbitHole = new RabbitHole();
+                            w.setTile(randomLoc, rabbitHole);
                         }
                     }
                 }

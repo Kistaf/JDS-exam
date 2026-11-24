@@ -1,17 +1,16 @@
 package models.structures;
 
-import itumulator.world.Location;
 import models.animals.Rabbit;
 import itumulator.world.NonBlocking;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Burrow implements NonBlocking {
+public class RabbitHole implements NonBlocking {
     private List<Rabbit> boundRabbits;
     private Tunnel tunnel;
 
-    public Burrow() {
+    public RabbitHole() {
         boundRabbits = new ArrayList<>();
         tunnel = null;
     }

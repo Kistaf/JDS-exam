@@ -25,7 +25,7 @@ public class Main {
         try {
             ThemeReader reader = new ThemeReader("resources/tema/tema2/week-2/t2-1ab.txt");
 
-            Program p = new Program(reader.getWorldSize(), 800, 1200);
+            Program p = new Program(reader.getWorldSize(), 800, 200);
             World w = p.getWorld();
 
             DisplayInformation d1 = new DisplayInformation(Color.green, "grass");

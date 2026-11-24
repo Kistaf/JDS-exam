@@ -33,8 +33,8 @@ public class Grass implements Actor, Consumable, NonBlocking {
 
         int worldSize = world.getSize();
         double grassTakingUpPercentage = (currentGrassAmount / (worldSize * worldSize));
-        if (grassTakingUpPercentage >= 0.25) return;
-        boolean success = NumberUtils.chancePercentage(5);
+        if (grassTakingUpPercentage >= 0.20) return;
+        boolean success = NumberUtils.chancePercentage(12);
         if (success) spread(world);
     }
 

@@ -367,4 +367,9 @@ public class Wolf extends Animal {
     public void setBoundPack(WolfPack boundPack) {
         this.boundPack = boundPack;
     }
+
+    @Override
+    protected double adultAge() {
+        return 0;
+    }
 }

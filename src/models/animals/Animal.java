@@ -1,5 +1,7 @@
 package models.animals;
 
+import itumulator.executable.DisplayInformation;
+import itumulator.executable.DynamicDisplayInformationProvider;
 import itumulator.simulator.Actor;
 import itumulator.world.Location;
 import itumulator.world.World;
@@ -7,16 +9,16 @@ import models.structures.Carcass;
 import utils.CollectionUtils;
 import utils.LocationUtils;
 
+import java.awt.*;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public abstract class Animal implements Actor {
+public abstract class Animal implements Actor, DynamicDisplayInformationProvider {
     protected double age = 0;
     protected double energy;
-
-    protected Animal() {}
+    protected String imageKey;
 
     @Override
     public void act(World world) {
@@ -74,6 +76,8 @@ public abstract class Animal implements Actor {
     protected abstract double maxAge();
 
 
+    protected abstract double adultAge();
+
     protected void die(World world) {
         Location location = null;
         if ((world.isOnTile(this))){
@@ -107,5 +111,12 @@ public abstract class Animal implements Actor {
     }
 
 
+    @Override
+    public DisplayInformation getInformation() {
+        StringBuilder builder = new StringBuilder(this.imageKey);
+        if (this.age >= this.adultAge()) builder.append("-large");
+        else builder.append("-small");
+        return new DisplayInformation(Color.GREEN, builder.toString(), true);
+    }
 
 }

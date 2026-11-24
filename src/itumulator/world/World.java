@@ -124,7 +124,7 @@ public class World {
     /**
      * Sets the location which is deemed as the 'current' location. This is the
      * location used when calling parameterless methods normally requiring a
-     * parameter (e.g., {@link getSurroundingTiles() getSurroundingTiles}). Please note that methods like  {@link move(Object, Location) move} and {@link setTile(Location, Object) setTile} do not update this location.
+     * parameter (e.g., {@link getSurroundingTiles() getSurroundingTiles}). Please note that methods like  {@link move(Object, Location) performMove} and {@link setTile(Location, Object) setTile} do not update this location.
      * You have to do that manually using {@link setCurrentLocation(Location)} if you want to keep using the parameterless methods.
      * 
      * @param current the location which will be set as currently under examination

@@ -14,4 +14,11 @@ public class CollectionUtils {
         return list.get(random.nextInt(list.size()));
     }
 
+    public static <T> T randomListElement(List<T> list){
+        if (list == null || list.isEmpty()) return null;
+
+        Random random = new Random();
+        return list.get(random.nextInt(list.size()));
+    }
+
 }

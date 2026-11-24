@@ -27,4 +27,9 @@ public class Wolf extends Animal {
     protected double maxAge() {
         return 0;
     }
+
+    @Override
+    protected double adultAge() {
+        return 0;
+    }
 }

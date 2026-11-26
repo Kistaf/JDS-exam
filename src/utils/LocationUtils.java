@@ -52,6 +52,7 @@ public class LocationUtils {
         return null;
     }
 
+
     public static Location slowRandomFreeTile(World world){
         List<Location> possibleLocations = new ArrayList<>();
         int worldSize = world.getSize();

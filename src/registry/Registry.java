@@ -1,4 +1,4 @@
-package Registry;
+package registry;
 
 import itumulator.world.Location;
 import itumulator.world.World;
@@ -16,6 +16,8 @@ import utils.NumberUtils;
 import java.util.List;
 
 public class Registry {
+
+    // Registry manages no state so best approach to just use a static load method
     public static void load(World world, List<ThemeReaderModel> models) {
         for (ThemeReaderModel model : models) {
             if (model.getName().equalsIgnoreCase("wolf")) {

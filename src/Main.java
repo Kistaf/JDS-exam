@@ -1,23 +1,17 @@
 import java.awt.*;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
-import Registry.Registry;
+import registry.Registry;
 import itumulator.executable.DisplayInformation;
 import itumulator.executable.Program;
-import itumulator.world.Location;
 import itumulator.world.World;
 import models.animals.Rabbit;
 import models.animals.Wolf;
-import models.animals.WolfPack;
 import models.plants.Grass;
-import models.plants.berries.BlueberryBush;
-import models.plants.berries.RaspberryBush;
 import models.structures.RabbitHole;
 import models.structures.Carcass;
 import models.structures.WolfDen;
-import models.utils.ThemeReaderModel;
-import utils.LocationUtils;
-import utils.NumberUtils;
 import utils.ThemeReader;
 
 public class Main {
@@ -49,7 +43,7 @@ public class Main {
             for (int i = 0; i < 1000; i++) {
                 p.simulate();
             }
-        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }

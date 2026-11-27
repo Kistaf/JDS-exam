@@ -1,5 +1,4 @@
 import java.awt.*;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import registry.Registry;
@@ -18,7 +17,7 @@ public class Main {
 
     public static void main(String[] args) {
         try {
-            ThemeReader reader = new ThemeReader("resources/tema/tema2/week-2/t2-1ab.txt");
+            ThemeReader reader = new ThemeReader("resources/tema/tema3/week-3/tf3-1a.txt");
 
             Program p = new Program(reader.getWorldSize(), 800, 200);
             World w = p.getWorld();
@@ -37,7 +36,7 @@ public class Main {
             p.setDisplayInformation(Carcass.class, d6);
 
 
-            Registry.load(w, reader.getModels());
+            Registry.load(w, reader.getEntities());
 
             p.show();
             for (int i = 0; i < 1000; i++) {

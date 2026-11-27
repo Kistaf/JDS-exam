@@ -1,34 +1,43 @@
 package utils;
 
 import itumulator.world.Location;
-import models.utils.ThemeReaderModel;
-import org.junit.platform.engine.support.discovery.SelectorResolver;
+import models.utils.ThemeReaderEntity;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ThemeReader {
     private final int worldSize;
-    private final List<ThemeReaderModel> models;
+    private final List<ThemeReaderEntity> entities;
 
     private static final Pattern RANGE_PATTERN = Pattern.compile("(\\d+)-(\\d+)");
     private static final Pattern LOCATION_PATTERN = Pattern.compile("\\((\\d+),(\\d+)\\)");
 
+    private static final Set<String> ENTITIES = Set.of(
+            "grass",
+            "rabbit",
+            "burrow",
+            "carcass",
+            "wolf",
+            "bear",
+            "berry"
+    );
+
+    private static final Set<String> VARIANTS = Set.of(
+            "fungi",
+            "cordyceps"
+    );
+
 
     public ThemeReader(String path) throws IOException {
-        List<ThemeReaderModel> parsedModels = new ArrayList<>();
+        List<ThemeReaderEntity> parsedEntities = new ArrayList<>();
         Random random = new Random();
 
-        try (BufferedReader reader = Files.newBufferedReader(Path.of(path))) {
-            String firstLine = reader.readLine();
+        try (Scanner reader = new Scanner(new File(path))) {
+            String firstLine = reader.nextLine();
 
             if (firstLine == null) {
                 throw new IOException("The input file is empty: " + path);
@@ -43,17 +52,17 @@ public class ThemeReader {
             String line;
             int lineNumber = 1;
 
-            while ((line = reader.readLine()) != null) {
+            while (reader.hasNextLine()) {
+                line = reader.nextLine().trim();
                 lineNumber++;
-                line = line.trim();
 
                 if (line.isEmpty()) {
                     continue;
                 }
 
                 try {
-                    ThemeReaderModel model = this.parseModel(line, random);
-                    parsedModels.add(model);
+                    ThemeReaderEntity entity = this.parseEntity(line, random);
+                    parsedEntities.add(entity);
                 } catch (IllegalArgumentException e) {
                     String error = String.format("Invalid entry on line %d: %s", lineNumber, e);
                     throw new IOException(error);
@@ -61,25 +70,65 @@ public class ThemeReader {
             }
         }
 
-        this.models = parsedModels;
+        this.entities = parsedEntities;
     }
 
-    private ThemeReaderModel parseModel(String line, Random random) {
+    private ThemeReaderEntity parseEntity(String line, Random random) {
         String[] parts = line.split("\\s+");
 
         if (parts.length < 2 || parts.length > 4) {
             throw new IllegalArgumentException("Invalid model format");
         }
 
-        String name = parts[0].toLowerCase();
-        int count = this.parseCount(parts[1], random);
+        String name;
+        int count;
+        Location location = null;
+        String variant = null;
 
-        if (name.equals("bear") && parts.length == 3) {
-            Location location = this.parseLocation(parts[2]);
-            return new ThemeReaderModel(name, count, location);
+        int leadingEndIdx = parts.length;
+
+        if (parts[leadingEndIdx - 1].startsWith("(")) { // line contains a location
+            location = parseLocation(parts[leadingEndIdx - 1]);
+            leadingEndIdx--;
         }
 
-        return new ThemeReaderModel(name, count);
+        if (leadingEndIdx < 2) {
+            throw new IllegalStateException("Count is missing: " + line);
+        }
+
+        count = parseCount(parts[leadingEndIdx - 1], random);
+
+        String[] nameAndVariant = Arrays.copyOfRange(parts, 0, leadingEndIdx - 1);
+
+
+        // no variant
+        if (nameAndVariant.length == 1) {
+            name = nameAndVariant[0].toLowerCase();
+            if (!ENTITIES.contains(name)) {
+                throw new IllegalArgumentException("Entity is not in the register: " + name);
+            }
+        } else if (nameAndVariant.length == 2) { // variants also in input file
+            String first = nameAndVariant[0].toLowerCase();
+            String second = nameAndVariant[1].toLowerCase();
+
+            boolean firstIsEntity = ENTITIES.contains(first) && VARIANTS.contains(second);
+            boolean secondIsEntity = VARIANTS.contains(first) && ENTITIES.contains(second);
+
+            if (firstIsEntity == secondIsEntity) { // something went wrong
+                throw new IllegalArgumentException("Failed to interpret name & variant");
+            }
+
+            name = firstIsEntity ? first : second;
+            variant = firstIsEntity ? second : first;
+        } else {
+            throw new IllegalArgumentException("Invalid line entry: " + line);
+        }
+
+        if (location != null && !name.equals("bear")) {
+            throw new IllegalArgumentException("Only bears can have a pre-defined spawn location");
+        }
+
+        return new ThemeReaderEntity(name, count, location, variant);
     }
 
     private int parseCount(String value, Random random) {
@@ -116,15 +165,15 @@ public class ThemeReader {
         return worldSize;
     }
 
-    public List<ThemeReaderModel> getModels() {
-        return List.copyOf(this.models);
+    public List<ThemeReaderEntity> getEntities() {
+        return List.copyOf(this.entities);
     }
 
     @Override
     public String toString() {
         return "ThemeReader{" +
                 "worldSize=" + worldSize +
-                ", models=" + models +
+                ", entities=" + entities +
                 '}';
     }
 }
